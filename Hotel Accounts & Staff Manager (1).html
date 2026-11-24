@@ -1,0 +1,2979 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#070b14" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="HotelKhata" />
+  <meta name="application-name" content="HotelKhata" />
+  <link id="dynamicFavicon" rel="icon" type="image/png" href="" />
+  <link id="dynamicAppleIcon" rel="apple-touch-icon" href="" />
+  <link id="dynamicManifest" rel="manifest" href="" />
+  <title>HotelKhata — Official Hotel Accounts & Staff Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            slate: {
+              850: '#152033',
+              925: '#0c1322',
+              950: '#070b14',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    html, body {
+      overscroll-behavior-y: none;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #070b14;
+      color: #f1f5f9;
+      overflow-x: hidden;
+      padding-top: env(safe-area-inset-top);
+    }
+    .safe-bottom {
+      padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    }
+    .app-content-pad {
+      padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+    }
+    @media (min-width: 1024px) {
+      .app-content-pad { padding-bottom: 2rem; }
+    }
+    input[type="date"], input[type="month"] {
+      color-scheme: dark;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    .tab-fade { animation: fadeIn 0.2s ease-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .toast-enter { animation: toastSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes toastSlide {
+      from { opacity: 0; transform: translateY(16px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- ==================== STANDALONE OWNER AUTH & SETUP PORTAL ==================== -->
+  <div id="authPortal" class="hidden min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+    <!-- Subtle executive background glow -->
+    <div class="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[520px] h-[520px] rounded-full bg-emerald-500/10 blur-3xl"></div>
+    <div class="pointer-events-none absolute bottom-0 right-0 w-[360px] h-[360px] rounded-full bg-indigo-500/10 blur-3xl"></div>
+
+    <div class="w-full max-w-md relative z-10">
+      <!-- Brand Identity -->
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-2xl shadow-emerald-950/60 mb-3.5">
+          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l8-4v18m6 0V11l-6-3M9 9h.01M9 13h.01M9 17h.01" />
+          </svg>
+        </div>
+        <h1 id="authBrandTitle" class="text-2xl font-extrabold tracking-tight text-white">HotelKhata</h1>
+        <p id="authBrandSubtitle" class="text-xs sm:text-sm text-slate-400 mt-1">Official Private Accounts & Staff Management Portal</p>
+      </div>
+
+      <!-- Auth Card -->
+      <div class="rounded-3xl bg-slate-900/90 backdrop-blur-xl border border-slate-800/90 shadow-2xl p-6 sm:p-7">
+        <!-- Inline Status / Error Banner -->
+        <div id="authMessageBox" class="hidden mb-4 rounded-xl px-3.5 py-2.5 text-xs font-medium border"></div>
+
+        <!-- VIEW 1: FIRST-TIME SETUP FORM -->
+        <form id="setupForm" class="hidden space-y-3.5">
+          <div class="mb-2">
+            <h2 class="text-base sm:text-lg font-bold text-white">Setup Your Private Hotel Portal</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Create your personal owner ID & password. Works 100% offline with zero external setup.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Hotel Name *</label>
+              <input type="text" id="setupHotelName" required placeholder="e.g. Hotel Grand Palace" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Owner Name *</label>
+              <input type="text" id="setupOwnerName" required placeholder="e.g. Rajesh Verma" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Personal Login ID (Username or Email) *</label>
+            <input type="text" id="setupLoginId" required autocomplete="username" placeholder="e.g. rajesh_owner or owner@hotel.com" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Password *</label>
+              <input type="password" id="setupPassword" required minlength="4" autocomplete="new-password" placeholder="Min 4 chars" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Confirm Password *</label>
+              <input type="password" id="setupConfirmPassword" required minlength="4" autocomplete="new-password" placeholder="Re-enter password" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">4-Digit Recovery PIN *</label>
+            <input type="password" id="setupPin" required pattern="\d{4}" maxlength="4" inputmode="numeric" placeholder="e.g. 4821 (used if you forget password)" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm font-mono tracking-widest text-white outline-none placeholder:text-slate-600 placeholder:font-sans placeholder:tracking-normal" />
+          </div>
+
+          <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white text-sm font-semibold transition-all shadow-lg shadow-emerald-950/50 mt-2">
+            Create Private Portal & Sign In
+          </button>
+        </form>
+
+        <!-- VIEW 2: OWNER LOGIN FORM -->
+        <form id="loginForm" class="hidden space-y-4">
+          <div class="mb-2">
+            <h2 class="text-base sm:text-lg font-bold text-white">Owner Login</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Sign in with your Personal Login ID and Password.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1.5">Personal Login ID *</label>
+            <input type="text" id="loginId" required autocomplete="username" placeholder="Enter your username or email" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block text-xs font-medium text-slate-300">Password *</label>
+              <button type="button" onclick="showAuthView('recover')" class="text-[11px] font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
+                Forgot Password?
+              </button>
+            </div>
+            <div class="relative">
+              <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Enter your password" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/40 rounded-xl pl-3.5 pr-11 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+              <button type="button" onclick="togglePasswordVisibility('loginPassword')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-1" aria-label="Toggle Password">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <input type="checkbox" id="rememberDevice" checked class="w-4 h-4 rounded border-slate-700 bg-slate-950 text-emerald-500 focus:ring-emerald-500/40" />
+            <span class="text-xs text-slate-300">Remember this device / Stay logged in</span>
+          </label>
+
+          <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white text-sm font-semibold transition-all shadow-lg shadow-emerald-950/50">
+            Sign In to Portal
+          </button>
+        </form>
+
+        <!-- VIEW 3: FORGOT PASSWORD / RECOVERY PIN FORM -->
+        <form id="recoverForm" class="hidden space-y-4">
+          <div class="mb-2">
+            <h2 class="text-base sm:text-lg font-bold text-white">Reset Password via Recovery PIN</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Verify your Personal Login ID and 4-digit Recovery PIN to set a new password.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1.5">Personal Login ID *</label>
+            <input type="text" id="recoverLoginId" required placeholder="Your registered username or email" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1.5">4-Digit Recovery PIN *</label>
+            <input type="password" id="recoverPin" required pattern="\d{4}" maxlength="4" inputmode="numeric" placeholder="Enter 4-digit PIN" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-sm font-mono tracking-widest text-white outline-none placeholder:text-slate-600 placeholder:font-sans placeholder:tracking-normal" />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">New Password *</label>
+              <input type="password" id="recoverNewPassword" required minlength="4" placeholder="New password" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">Confirm New *</label>
+              <input type="password" id="recoverConfirmPassword" required minlength="4" placeholder="Confirm password" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-all shadow-lg shadow-emerald-950/50">
+            Verify PIN & Reset Password
+          </button>
+
+          <button type="button" onclick="showAuthView('login')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-colors">
+            Back to Owner Login
+          </button>
+        </form>
+
+        <!-- Security Notice -->
+        <div class="mt-6 pt-5 border-t border-slate-800/80 flex items-center justify-center gap-2 text-[11px] text-slate-400">
+          <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span>100% Standalone • SHA-256 Protected • Offline Ready</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN AUTHENTICATED APP SHELL ==================== -->
+  <div id="appShell" class="hidden">
+
+    <!-- ==================== DESKTOP SIDEBAR ==================== -->
+    <aside class="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-slate-900/95 border-r border-slate-800/80 z-30">
+      <!-- Brand -->
+      <div class="flex items-center gap-3 px-5 py-5 border-b border-slate-800/80">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-950/50 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l8-4v18m6 0V11l-6-3M9 9h.01M9 13h.01M9 17h.01" />
+          </svg>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h1 id="sidebarHotelName" class="text-sm font-bold tracking-tight text-white truncate">HotelKhata</h1>
+          <p id="sidebarHotelSub" class="text-[11px] font-medium text-slate-400 truncate">Official Owner Portal</p>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto" id="desktopNav">
+        <button data-tab="dashboard" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+          </svg>
+          <span>Dashboard</span>
+        </button>
+
+        <button data-tab="revenue" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Revenue</span>
+        </button>
+
+        <button data-tab="expenses" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+          </svg>
+          <span>Expenses</span>
+        </button>
+
+        <button data-tab="staff" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Staff & Salary</span>
+        </button>
+
+        <div class="pt-3 mt-3 border-t border-slate-800/80 space-y-1">
+          <button onclick="openProfileModal()" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/70 transition-all">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>Hotel Profile</span>
+          </button>
+
+          <button onclick="openInstallModal()" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition-all">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            <span>Install Mobile App</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Sidebar Local Vault Status & Owner Session -->
+      <div class="p-4 border-t border-slate-800/80 space-y-3">
+        <div class="rounded-xl bg-slate-950/80 border border-slate-800/90 p-3">
+          <div id="sidebarSyncBadge" class="flex items-center gap-2 text-xs font-semibold text-emerald-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Private Local Vault</span>
+          </div>
+          <p id="sidebarUserEmail" class="text-[11px] text-slate-400 mt-1.5 truncate" title="">owner</p>
+        </div>
+
+        <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 text-xs font-semibold transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+    <div class="lg:pl-64 flex flex-col min-h-screen app-content-pad">
+
+      <!-- Top Sticky Header -->
+      <header class="sticky top-0 z-20 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 py-3">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          <!-- Mobile Brand / Desktop Page Title -->
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="lg:hidden w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow shrink-0">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l8-4v18m6 0V11l-6-3" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <h2 id="headerTitle" class="text-sm sm:text-lg font-bold text-white leading-tight truncate">Dashboard</h2>
+                <span id="headerHotelBadge" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-800/90 text-slate-300 border border-slate-700/80 truncate max-w-[180px]">HotelKhata</span>
+              </div>
+              <p id="todayDateDisplay" class="text-[11px] text-slate-400 font-medium truncate"></p>
+            </div>
+          </div>
+
+          <!-- Header Controls: Local Vault Status, Month Selector, Profile, Logout -->
+          <div class="flex items-center gap-2">
+            <!-- Local Storage Pill -->
+            <div id="headerSyncBadge" class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-semibold text-emerald-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span>Saved Locally</span>
+            </div>
+
+            <!-- Month Selector -->
+            <input
+              type="month"
+              id="globalMonthInput"
+              class="bg-slate-900 border border-slate-700/90 hover:border-slate-600 focus:border-emerald-500 rounded-xl px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-semibold text-slate-100 outline-none transition-colors cursor-pointer"
+            />
+
+            <!-- Install Mobile App Quick Button -->
+            <button onclick="openInstallModal()" title="Install Mobile App / APK Guide" class="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition-colors">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span class="hidden sm:inline">Install App</span>
+            </button>
+
+            <!-- Hotel Profile Settings Button (Quick Access) -->
+            <button onclick="openProfileModal()" title="Hotel Profile & Settings" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+
+            <!-- Mobile / Header Logout Button -->
+            <button onclick="handleLogout()" title="Logout" class="lg:hidden p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Container -->
+      <main class="flex-1 px-4 sm:px-6 py-5 max-w-6xl w-full mx-auto">
+
+        <!-- ==================== MODULE 1: DASHBOARD ==================== -->
+        <section id="tab-dashboard" class="tab-section tab-fade space-y-6">
+
+          <!-- Empty State Welcome Banner -->
+          <div id="emptyWelcomeBanner" class="hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/40 border border-emerald-500/30 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-sm sm:text-base font-semibold text-white">Welcome to your Official Hotel Portal!</h3>
+              <p class="text-xs sm:text-sm text-slate-300 mt-0.5">
+                All your entries are saved privately on this device. Start adding records or load sample data to test everything right away.
+              </p>
+            </div>
+            <button onclick="loadDemoData()" class="shrink-0 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold transition-colors shadow-lg shadow-emerald-950/40">
+              Load Sample Data
+            </button>
+          </div>
+
+          <!-- Top 6 Summary Cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <!-- Today's Revenue -->
+            <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-4 hover:border-emerald-500/30 transition-colors">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] sm:text-xs font-medium text-slate-400">Today's Revenue</span>
+                <span class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 11l5-5m0 0l5 5m-5-5v12"/></svg>
+                </span>
+              </div>
+              <p id="dashTodayRev" class="text-lg sm:text-2xl font-bold text-emerald-400 mt-2 tracking-tight">₹0</p>
+              <p id="dashTodayRevSub" class="text-[11px] text-slate-500 mt-1">0 entries today</p>
+            </div>
+
+            <!-- Today's Expense -->
+            <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-4 hover:border-rose-500/30 transition-colors">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] sm:text-xs font-medium text-slate-400">Today's Expense</span>
+                <span class="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 13l-5 5m0 0l-5-5m5 5V6"/></svg>
+                </span>
+              </div>
+              <p id="dashTodayExp" class="text-lg sm:text-2xl font-bold text-rose-400 mt-2 tracking-tight">₹0</p>
+              <p id="dashTodayExpSub" class="text-[11px] text-slate-500 mt-1">Includes staff payouts</p>
+            </div>
+
+            <!-- Today's Net Cashflow -->
+            <div class="col-span-2 lg:col-span-1 rounded-2xl bg-slate-900/90 border border-slate-800/90 p-4 hover:border-slate-700 transition-colors">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] sm:text-xs font-medium text-slate-400">Today's Net Cashflow</span>
+                <span class="w-7 h-7 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                </span>
+              </div>
+              <p id="dashTodayNet" class="text-lg sm:text-2xl font-bold text-slate-100 mt-2 tracking-tight">₹0</p>
+              <p id="dashTodayNetSub" class="text-[11px] text-slate-500 mt-1">Today's Revenue − Expense</p>
+            </div>
+
+            <!-- Monthly Revenue -->
+            <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-4 hover:border-emerald-500/30 transition-colors">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] sm:text-xs font-medium text-slate-400">Monthly Revenue</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400" id="dashMonthBadge1">Month</span>
+              </div>
+              <p id="dashMonthRev" class="text-lg sm:text-2xl font-bold text-emerald-400 mt-2 tracking-tight">₹0</p>
+              <p id="dashMonthBookings" class="text-[11px] text-slate-500 mt-1">0 bookings / entries</p>
+            </div>
+
+            <!-- Monthly Total Expenses -->
+            <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-4 hover:border-rose-500/30 transition-colors">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] sm:text-xs font-medium text-slate-400">Monthly Expenses</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/10 text-rose-400">All Outflow</span>
+              </div>
+              <p id="dashMonthExp" class="text-lg sm:text-2xl font-bold text-rose-400 mt-2 tracking-tight">₹0</p>
+              <p id="dashMonthExpBreakdown" class="text-[11px] text-slate-500 mt-1 truncate">Ops: ₹0 • Staff: ₹0</p>
+            </div>
+
+            <!-- Monthly Net Profit / Loss -->
+            <div class="col-span-2 lg:col-span-1 rounded-2xl bg-slate-900/90 border border-slate-800/90 p-4 relative overflow-hidden">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] sm:text-xs font-medium text-slate-400">Monthly Net Profit / Loss</span>
+                <span id="dashProfitBadge" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-300">Neutral</span>
+              </div>
+              <p id="dashMonthNet" class="text-lg sm:text-2xl font-bold text-white mt-2 tracking-tight">₹0</p>
+              <p id="dashMonthMargin" class="text-[11px] text-slate-500 mt-1">Net margin: 0%</p>
+            </div>
+          </div>
+
+          <!-- Visual Comparison & Payment Mode Breakdown -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+
+            <!-- Bar Comparison Chart -->
+            <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-5 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 class="text-sm font-semibold text-white">Monthly Financial Overview</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Revenue vs Operating Expenses vs Staff Payouts</p>
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  <div>
+                    <div class="flex items-center justify-between text-xs mb-1.5">
+                      <span class="font-medium text-slate-300 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                        Total Revenue
+                      </span>
+                      <span id="barRevVal" class="font-semibold text-emerald-400">₹0</span>
+                    </div>
+                    <div class="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+                      <div id="barRevFill" class="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex items-center justify-between text-xs mb-1.5">
+                      <span class="font-medium text-slate-300 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                        Operating Expenses
+                      </span>
+                      <span id="barExpVal" class="font-semibold text-rose-400">₹0</span>
+                    </div>
+                    <div class="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+                      <div id="barExpFill" class="h-full rounded-full bg-gradient-to-r from-rose-600 to-rose-400 transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex items-center justify-between text-xs mb-1.5">
+                      <span class="font-medium text-slate-300 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                        Staff Salary & Advances
+                      </span>
+                      <span id="barStaffVal" class="font-semibold text-amber-400">₹0</span>
+                    </div>
+                    <div class="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+                      <div id="barStaffFill" class="h-full rounded-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Action Buttons -->
+              <div class="grid grid-cols-3 gap-2 mt-6 pt-4 border-t border-slate-800/80">
+                <button onclick="switchTab('revenue')" class="py-2 px-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 text-xs font-semibold transition-colors text-center">
+                  + Revenue
+                </button>
+                <button onclick="switchTab('expenses')" class="py-2 px-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 text-xs font-semibold transition-colors text-center">
+                  + Expense
+                </button>
+                <button onclick="switchTab('staff')" class="py-2 px-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-400 text-xs font-semibold transition-colors text-center">
+                  + Staff Pay
+                </button>
+              </div>
+            </div>
+
+            <!-- Payment Mode Breakdown -->
+            <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-5">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-sm font-semibold text-white">Payment Mode Breakdown</h3>
+                  <p class="text-xs text-slate-400 mt-0.5">Selected month inflow & outflow by mode</p>
+                </div>
+              </div>
+              <div class="space-y-3" id="paymentModeCards"></div>
+            </div>
+
+          </div>
+
+          <!-- Recent Activity Snapshot -->
+          <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-5">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-semibold text-white">Recent Activity (Selected Month)</h3>
+              <span class="text-xs text-slate-400">Latest 6 entries</span>
+            </div>
+            <div id="dashRecentList" class="divide-y divide-slate-800/80"></div>
+          </div>
+        </section>
+
+        <!-- ==================== MODULE 2: REVENUE (STRICTLY BOOKING ID) ==================== -->
+        <section id="tab-revenue" class="tab-section tab-fade hidden space-y-5">
+          <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-5">
+            <div class="flex items-center justify-between mb-4">
+              <h3 id="revFormTitle" class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                Add Daily Revenue
+              </h3>
+              <button id="revCancelEditBtn" onclick="resetRevenueForm()" class="hidden text-xs font-medium text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-slate-800">
+                Cancel Edit
+              </button>
+            </div>
+
+            <form id="revenueForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5">
+              <input type="hidden" id="revId" />
+
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Date *</label>
+                <input type="date" id="revDate" required class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Booking ID *</label>
+                <input type="text" id="revBookingId" required placeholder="e.g. OYO12345 or WLK-001" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm font-mono text-white outline-none placeholder:text-slate-600 placeholder:font-sans" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Revenue Source *</label>
+                <select id="revCategory" required class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none">
+                  <option value="Walk-in">Walk-in</option>
+                  <option value="OYO">OYO</option>
+                  <option value="Online OTA">Online OTA</option>
+                  <option value="F&B">F&B</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Payment Mode *</label>
+                <select id="revMode" required class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none">
+                  <option value="Cash">Cash</option>
+                  <option value="UPI">UPI</option>
+                  <option value="OYO Prepaid">OYO Prepaid</option>
+                  <option value="Card / Bank">Card / Bank</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Amount (₹) *</label>
+                <input type="number" id="revAmount" required min="1" step="0.01" placeholder="0" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm font-semibold text-emerald-400 outline-none placeholder:text-slate-600" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Notes</label>
+                <input type="text" id="revNote" placeholder="Optional remarks" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+              </div>
+
+              <div class="sm:col-span-2 lg:col-span-6 flex justify-end pt-1">
+                <button type="submit" id="revSubmitBtn" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white text-sm font-semibold transition-all shadow-lg shadow-emerald-950/40">
+                  Save Revenue Entry
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Revenue Summary & Filter Bar -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-slate-900/70 border border-slate-800/80 rounded-2xl p-4">
+            <div class="flex flex-wrap items-center gap-4">
+              <div>
+                <p class="text-[11px] text-slate-400">Filtered Revenue</p>
+                <p id="revFilteredTotal" class="text-lg font-bold text-emerald-400">₹0</p>
+              </div>
+              <div class="h-8 w-px bg-slate-800"></div>
+              <div>
+                <p class="text-[11px] text-slate-400">Total Bookings</p>
+                <p id="revFilteredCount" class="text-lg font-bold text-white">0</p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <input
+                type="text"
+                id="revSearchBookingId"
+                oninput="renderRevenueTable()"
+                placeholder="Search Booking ID..."
+                class="bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2 text-xs text-slate-100 outline-none placeholder:text-slate-500 w-full sm:w-44"
+              />
+              <select id="revFilterCategory" onchange="renderRevenueTable()" class="bg-slate-950 border border-slate-700/90 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none">
+                <option value="ALL">All Sources</option>
+                <option value="Walk-in">Walk-in</option>
+                <option value="OYO">OYO</option>
+                <option value="Online OTA">Online OTA</option>
+                <option value="F&B">F&B</option>
+                <option value="Other">Other</option>
+              </select>
+              <select id="revFilterMode" onchange="renderRevenueTable()" class="bg-slate-950 border border-slate-700/90 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none">
+                <option value="ALL">All Modes</option>
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI</option>
+                <option value="OYO Prepaid">OYO Prepaid</option>
+                <option value="Card / Bank">Card / Bank</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Revenue Table -->
+          <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400">
+                    <th class="py-3 px-4 font-semibold">Date</th>
+                    <th class="py-3 px-4 font-semibold">Booking ID</th>
+                    <th class="py-3 px-4 font-semibold">Source</th>
+                    <th class="py-3 px-4 font-semibold">Mode</th>
+                    <th class="py-3 px-4 font-semibold">Notes</th>
+                    <th class="py-3 px-4 font-semibold text-right">Amount</th>
+                    <th class="py-3 px-4 font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="revenueTableBody" class="divide-y divide-slate-800/70 text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== MODULE 3: EXPENSES ==================== -->
+        <section id="tab-expenses" class="tab-section tab-fade hidden space-y-5">
+          <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-5">
+            <div class="flex items-center justify-between mb-4">
+              <h3 id="expFormTitle" class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                Add Expense
+              </h3>
+              <button id="expCancelEditBtn" onclick="resetExpenseForm()" class="hidden text-xs font-medium text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-slate-800">
+                Cancel Edit
+              </button>
+            </div>
+
+            <form id="expenseForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5">
+              <input type="hidden" id="expId" />
+
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Date *</label>
+                <input type="date" id="expDate" required class="w-full bg-slate-950 border border-slate-700/90 focus:border-rose-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Expense Type *</label>
+                <select id="expType" required class="w-full bg-slate-950 border border-slate-700/90 focus:border-rose-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none">
+                  <option value="Daily Expense">Daily Expense</option>
+                  <option value="Monthly Fixed">Monthly Fixed</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Category *</label>
+                <select id="expCategory" required class="w-full bg-slate-950 border border-slate-700/90 focus:border-rose-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none">
+                  <option value="Kitchen/Groceries">Kitchen/Groceries</option>
+                  <option value="Electricity/Water">Electricity/Water</option>
+                  <option value="Internet/WiFi">Internet/WiFi</option>
+                  <option value="Housekeeping">Housekeeping</option>
+                  <option value="Maintenance">Maintenance</option>
+                  <option value="Rent/EMI">Rent/EMI</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Payment Mode *</label>
+                <select id="expMode" required class="w-full bg-slate-950 border border-slate-700/90 focus:border-rose-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none">
+                  <option value="Cash">Cash</option>
+                  <option value="UPI">UPI</option>
+                  <option value="Card / Bank">Card / Bank</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Amount (₹) *</label>
+                <input type="number" id="expAmount" required min="1" step="0.01" placeholder="0" class="w-full bg-slate-950 border border-slate-700/90 focus:border-rose-500 rounded-xl px-3 py-2.5 text-sm font-semibold text-rose-400 outline-none placeholder:text-slate-600" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Notes</label>
+                <input type="text" id="expNote" placeholder="Bill no., vendor, details" class="w-full bg-slate-950 border border-slate-700/90 focus:border-rose-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+              </div>
+
+              <div class="sm:col-span-2 lg:col-span-6 flex justify-end pt-1">
+                <button type="submit" id="expSubmitBtn" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 active:scale-[0.99] text-white text-sm font-semibold transition-all shadow-lg shadow-rose-950/40">
+                  Save Expense Entry
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Expense Filter Bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/70 border border-slate-800/80 rounded-2xl p-4">
+            <div class="flex flex-wrap items-center gap-4">
+              <div>
+                <p class="text-[11px] text-slate-400">Filtered Expenses</p>
+                <p id="expFilteredTotal" class="text-lg font-bold text-rose-400">₹0</p>
+              </div>
+              <div class="h-8 w-px bg-slate-800"></div>
+              <div>
+                <p class="text-[11px] text-slate-400">Entries</p>
+                <p id="expFilteredCount" class="text-lg font-bold text-white">0</p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <select id="expFilterType" onchange="renderExpenseTable()" class="bg-slate-950 border border-slate-700/90 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none">
+                <option value="ALL">All Types</option>
+                <option value="Daily Expense">Daily Expense</option>
+                <option value="Monthly Fixed">Monthly Fixed</option>
+              </select>
+              <select id="expFilterCategory" onchange="renderExpenseTable()" class="bg-slate-950 border border-slate-700/90 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none">
+                <option value="ALL">All Categories</option>
+                <option value="Kitchen/Groceries">Kitchen/Groceries</option>
+                <option value="Electricity/Water">Electricity/Water</option>
+                <option value="Internet/WiFi">Internet/WiFi</option>
+                <option value="Housekeeping">Housekeeping</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Rent/EMI">Rent/EMI</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Expense Table -->
+          <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400">
+                    <th class="py-3 px-4 font-semibold">Date</th>
+                    <th class="py-3 px-4 font-semibold">Type</th>
+                    <th class="py-3 px-4 font-semibold">Category</th>
+                    <th class="py-3 px-4 font-semibold">Mode</th>
+                    <th class="py-3 px-4 font-semibold">Notes</th>
+                    <th class="py-3 px-4 font-semibold text-right">Amount</th>
+                    <th class="py-3 px-4 font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="expenseTableBody" class="divide-y divide-slate-800/70 text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== MODULE 4: STAFF SALARY & ADVANCE ==================== -->
+        <section id="tab-staff" class="tab-section tab-fade hidden space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <!-- Add / Edit Staff Member -->
+            <div class="lg:col-span-5 rounded-2xl bg-slate-900/90 border border-slate-800/90 p-5">
+              <div class="flex items-center justify-between mb-4">
+                <h3 id="staffFormTitle" class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                  Add Staff Member
+                </h3>
+                <button id="staffCancelEditBtn" onclick="resetStaffForm()" class="hidden text-xs font-medium text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-slate-800">
+                  Cancel
+                </button>
+              </div>
+
+              <form id="staffForm" class="space-y-3">
+                <input type="hidden" id="staffId" />
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Staff Name *</label>
+                    <input type="text" id="staffName" required placeholder="e.g. Ramesh Kumar" class="w-full bg-slate-950 border border-slate-700/90 focus:border-sky-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Role *</label>
+                    <select id="staffRole" required class="w-full bg-slate-950 border border-slate-700/90 focus:border-sky-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none">
+                      <option value="Reception">Reception</option>
+                      <option value="Housekeeping">Housekeeping</option>
+                      <option value="Guard">Guard</option>
+                      <option value="Manager">Manager</option>
+                      <option value="Kitchen / Cook">Kitchen / Cook</option>
+                      <option value="Helper / Other">Helper / Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Phone / Notes</label>
+                    <input type="text" id="staffPhone" placeholder="98XXXXXXXX / Shift" class="w-full bg-slate-950 border border-slate-700/90 focus:border-sky-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Monthly Salary (₹) *</label>
+                    <input type="number" id="staffSalary" required min="0" step="1" placeholder="12000" class="w-full bg-slate-950 border border-slate-700/90 focus:border-sky-500 rounded-xl px-3 py-2.5 text-sm font-semibold text-white outline-none placeholder:text-slate-600" />
+                  </div>
+                </div>
+
+                <button type="submit" id="staffSubmitBtn" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold transition-colors shadow-lg shadow-sky-950/40">
+                  Save Staff Member
+                </button>
+              </form>
+            </div>
+
+            <!-- Record Staff Payout -->
+            <div class="lg:col-span-7 rounded-2xl bg-slate-900/90 border border-slate-800/90 p-5">
+              <div class="flex items-center justify-between mb-4">
+                <h3 id="staffTxFormTitle" class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                  Record Salary / Advance Payment
+                </h3>
+                <button id="staffTxCancelEditBtn" onclick="resetStaffTxForm()" class="hidden text-xs font-medium text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-slate-800">
+                  Cancel Edit
+                </button>
+              </div>
+
+              <form id="staffTxForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <input type="hidden" id="staffTxId" />
+
+                <div>
+                  <label class="block text-xs font-medium text-slate-400 mb-1">Select Staff *</label>
+                  <select id="staffTxStaffId" required class="w-full bg-slate-950 border border-slate-700/90 focus:border-amber-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none">
+                    <option value="">-- Choose Staff --</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-medium text-slate-400 mb-1">Date *</label>
+                  <input type="date" id="staffTxDate" required class="w-full bg-slate-950 border border-slate-700/90 focus:border-amber-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none" />
+                </div>
+
+                <div>
+                  <label class="block text-xs font-medium text-slate-400 mb-1">Type *</label>
+                  <select id="staffTxType" required class="w-full bg-slate-950 border border-slate-700/90 focus:border-amber-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none">
+                    <option value="Advance">Advance</option>
+                    <option value="Salary Payment">Salary Payment</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-medium text-slate-400 mb-1">Payment Mode *</label>
+                  <select id="staffTxMode" required class="w-full bg-slate-950 border border-slate-700/90 focus:border-amber-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none">
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Card / Bank">Card / Bank</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-medium text-slate-400 mb-1">Amount (₹) *</label>
+                  <input type="number" id="staffTxAmount" required min="1" step="0.01" placeholder="0" class="w-full bg-slate-950 border border-slate-700/90 focus:border-amber-500 rounded-xl px-3 py-2.5 text-sm font-semibold text-amber-400 outline-none placeholder:text-slate-600" />
+                </div>
+
+                <div>
+                  <label class="block text-xs font-medium text-slate-400 mb-1">Notes</label>
+                  <input type="text" id="staffTxNote" placeholder="e.g. Festival advance" class="w-full bg-slate-950 border border-slate-700/90 focus:border-amber-500 rounded-xl px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600" />
+                </div>
+
+                <div class="sm:col-span-2 lg:col-span-3 pt-1 flex justify-end">
+                  <button type="submit" id="staffTxSubmitBtn" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold transition-colors shadow-lg shadow-amber-950/40">
+                    Record Payment
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Monthly Staff Ledger -->
+          <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 class="text-sm sm:text-base font-semibold text-white">Monthly Staff Salary Ledger</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Auto-calculated balances for the selected month</p>
+              </div>
+              <div class="flex items-center gap-3 text-xs">
+                <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300">Total Payroll: <strong id="ledgerTotalSalary" class="text-white">₹0</strong></span>
+                <span class="px-2.5 py-1 rounded-lg bg-rose-500/10 text-rose-300">Pending: <strong id="ledgerTotalPending" class="text-rose-400">₹0</strong></span>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400">
+                    <th class="py-3 px-4 font-semibold">Staff Member</th>
+                    <th class="py-3 px-4 font-semibold text-right">Monthly Salary</th>
+                    <th class="py-3 px-4 font-semibold text-right">Advance Taken</th>
+                    <th class="py-3 px-4 font-semibold text-right">Salary Paid</th>
+                    <th class="py-3 px-4 font-semibold text-right">Pending Balance</th>
+                    <th class="py-3 px-4 font-semibold text-center">Status</th>
+                    <th class="py-3 px-4 font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="staffLedgerBody" class="divide-y divide-slate-800/70 text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Staff Payment History -->
+          <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 class="text-sm sm:text-base font-semibold text-white">Staff Payment History (Selected Month)</h3>
+                <p class="text-xs text-slate-400 mt-0.5">All advances and salary payouts recorded this month</p>
+              </div>
+              <select id="staffTxFilterStaff" onchange="renderStaffTxTable()" class="bg-slate-950 border border-slate-700/90 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none">
+                <option value="ALL">All Staff</option>
+              </select>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400">
+                    <th class="py-3 px-4 font-semibold">Date</th>
+                    <th class="py-3 px-4 font-semibold">Staff</th>
+                    <th class="py-3 px-4 font-semibold">Type</th>
+                    <th class="py-3 px-4 font-semibold">Mode</th>
+                    <th class="py-3 px-4 font-semibold">Notes</th>
+                    <th class="py-3 px-4 font-semibold text-right">Amount</th>
+                    <th class="py-3 px-4 font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="staffTxTableBody" class="divide-y divide-slate-800/70 text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== MODULE 5: REPORTS & BACKUP ==================== -->
+        <section id="tab-reports" class="tab-section tab-fade hidden space-y-6">
+
+          <!-- Monthly Profit & Loss Statement -->
+          <div class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-5 sm:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+              <div>
+                <h3 id="reportHotelHeading" class="text-base sm:text-lg font-bold text-white">Monthly Profit & Loss Summary</h3>
+                <p id="reportMonthLabel" class="text-xs text-slate-400 mt-0.5">Selected Month Statement</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button onclick="exportMonthlyCSV()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-colors shadow-lg shadow-emerald-950/40">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  Monthly P&amp;L CSV
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+              <div class="rounded-xl bg-slate-950/70 border border-slate-800/80 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wider text-emerald-400 mb-3">Revenue Breakdown</p>
+                <div id="reportRevBreakdown" class="space-y-2 text-xs text-slate-300"></div>
+                <div class="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between font-bold text-sm">
+                  <span class="text-white">Total Revenue</span>
+                  <span id="reportTotalRev" class="text-emerald-400">₹0</span>
+                </div>
+              </div>
+
+              <div class="rounded-xl bg-slate-950/70 border border-slate-800/80 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wider text-rose-400 mb-3">Operating Expenses</p>
+                <div id="reportExpBreakdown" class="space-y-2 text-xs text-slate-300"></div>
+                <div class="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between font-bold text-sm">
+                  <span class="text-white">Total Operating</span>
+                  <span id="reportTotalExp" class="text-rose-400">₹0</span>
+                </div>
+              </div>
+
+              <div class="rounded-xl bg-slate-950/70 border border-slate-800/80 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wider text-amber-400 mb-3">Staff Payouts</p>
+                <div id="reportStaffBreakdown" class="space-y-2 text-xs text-slate-300"></div>
+                <div class="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between font-bold text-sm">
+                  <span class="text-white">Total Staff Paid</span>
+                  <span id="reportTotalStaff" class="text-amber-400">₹0</span>
+                </div>
+              </div>
+            </div>
+
+            <div id="reportNetBox" class="mt-5 rounded-xl border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-950/80 border-slate-800">
+              <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Net Profit / Loss (Revenue − Operating − Staff)</p>
+                <p id="reportNetSub" class="text-xs text-slate-500 mt-0.5">Profit Margin: 0%</p>
+              </div>
+              <p id="reportNetValue" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">₹0</p>
+            </div>
+
+    <!-- ==================== MOBILE BOTTOM NAVIGATION (NATIVE ANDROID STYLE) ==================== -->
+    <nav id="mobileNav" class="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800/90 px-2 pt-1.5 safe-bottom grid grid-cols-5 gap-1 shadow-[0_-8px_24px_rgba(0,0,0,0.45)]">
+      <button data-tab="dashboard" class="nav-btn-mobile flex flex-col items-center justify-center py-2 rounded-2xl text-[10px] font-medium transition-all">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        <span>Home</span>
+      </button>
+
+      <button data-tab="revenue" class="nav-btn-mobile flex flex-col items-center justify-center py-2 rounded-2xl text-[10px] font-medium transition-all">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Revenue</span>
+      </button>
+
+      <button data-tab="expenses" class="nav-btn-mobile flex flex-col items-center justify-center py-2 rounded-2xl text-[10px] font-medium transition-all">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+        <span>Expenses</span>
+      </button>
+
+      <button data-tab="staff" class="nav-btn-mobile flex flex-col items-center justify-center py-2 rounded-2xl text-[10px] font-medium transition-all">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span>Staff</span>
+      </button>
+
+      <button data-tab="reports" class="nav-btn-mobile flex flex-col items-center justify-center py-2 rounded-2xl text-[10px] font-medium transition-all">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span>Reports</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ==================== INSTALL MOBILE APP (PWA / APK) MODAL ==================== -->
+  <div id="installAppModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+    <div class="w-full max-w-md rounded-2xl bg-slate-900 border border-slate-700/80 p-5 sm:p-6 shadow-2xl my-auto">
+      <div class="flex items-start justify-between gap-3 pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <img id="installModalIconPreview" src="" alt="HK App Icon" class="w-12 h-12 rounded-2xl shadow-lg border border-emerald-500/30 bg-slate-950 shrink-0" />
+          <div>
+            <h4 class="text-base font-bold text-white">Install as Mobile App</h4>
+            <p class="text-xs text-slate-400 mt-0.5">PWA (Home Screen) &amp; Android APK Ready</p>
+          </div>
+        </div>
+        <button onclick="closeInstallModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-4 mt-4 text-xs text-slate-300">
+        <!-- Native One-Tap PWA Install Button (shown when supported by browser) -->
+        <button id="nativePwaInstallBtn" onclick="triggerNativeInstall()" class="hidden w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-all shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>Install App Now (One-Tap)</span>
+        </button>
+
+        <!-- Option 1: Add to Home Screen (PWA) -->
+        <div class="rounded-xl bg-slate-950/80 border border-slate-800 p-3.5 space-y-1.5">
+          <p class="text-xs font-bold text-emerald-400">Option 1: Install via Browser (Recommended — Free)</p>
+          <ol class="list-decimal list-inside space-y-1 text-slate-300 leading-relaxed">
+            <li>Click <strong>Download App HTML</strong> below to save <code class="text-emerald-300">index.html</code>.</li>
+            <li>Drop that file onto <strong>app.netlify.com/drop</strong> to get your private link.</li>
+            <li>Open the link in Chrome/Brave on your phone, tap <strong>⋮ (3 dots)</strong> &rarr; <strong>Install App / Add to Home Screen</strong>.</li>
+          </ol>
+        </div>
+
+        <!-- Option 2: Android APK -->
+        <div class="rounded-xl bg-slate-950/80 border border-slate-800 p-3.5 space-y-1.5">
+          <p class="text-xs font-bold text-indigo-400">Option 2: Create Direct Android .APK File</p>
+          <ol class="list-decimal list-inside space-y-1 text-slate-300 leading-relaxed">
+            <li>Download <code class="text-indigo-300">index.html</code> using the button below.</li>
+            <li>Open <strong>WebIntoApp.com</strong> (or AppsGeyser) &rarr; select <strong>HTML Files</strong>.</li>
+            <li>Upload <code class="text-indigo-300">index.html</code>, set your Hotel Name &amp; icon, and download your personal <strong>.apk</strong>.</li>
+          </ol>
+        </div>
+
+        <!-- Download App HTML Button -->
+        <div class="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
+          <button onclick="downloadAppHTML()" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>Download App HTML (index.html)</span>
+          </button>
+          <button onclick="closeInstallModal()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium transition-colors">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== HOTEL PROFILE & SECURITY SETTINGS MODAL ==================== -->
+  <div id="profileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+    <div class="w-full max-w-md rounded-2xl bg-slate-900 border border-slate-700/80 p-5 sm:p-6 shadow-2xl my-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div>
+          <h4 class="text-base font-bold text-white">Hotel Profile &amp; Security Settings</h4>
+          <p class="text-xs text-slate-400 mt-0.5">Update hotel branding or change your login credentials</p>
+        </div>
+        <button onclick="closeProfileModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="profileForm" class="space-y-3.5 mt-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Official Hotel Name *</label>
+          <input type="text" id="profileHotelName" required placeholder="e.g. Hotel Grand Palace" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3.5 py-2 text-sm text-white outline-none" />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">City / Tagline</label>
+            <input type="text" id="profileHotelCity" placeholder="e.g. Hyderabad • Main" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2 text-sm text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Owner Name</label>
+            <input type="text" id="profileOwnerName" placeholder="e.g. Rajesh Verma" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2 text-sm text-white outline-none" />
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800/80 space-y-3">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">Login &amp; Security Credentials</p>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Personal Login ID *</label>
+            <input type="text" id="profileLoginId" required placeholder="Username or email" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3.5 py-2 text-sm text-white outline-none" />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">New Password (Optional)</label>
+              <input type="password" id="profileNewPassword" minlength="4" placeholder="Leave blank to keep" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2 text-sm text-white outline-none placeholder:text-slate-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">New 4-Digit PIN (Optional)</label>
+              <input type="password" id="profileNewPin" pattern="\d{4}" maxlength="4" inputmode="numeric" placeholder="Leave blank to keep" class="w-full bg-slate-950 border border-slate-700/90 focus:border-emerald-500 rounded-xl px-3 py-2 text-sm font-mono text-white outline-none placeholder:text-slate-600 placeholder:font-sans" />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-2">
+          <button type="button" onclick="closeProfileModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium transition-colors">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold transition-colors">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== CUSTOM CONFIRMATION MODAL ==================== -->
+  <div id="confirmModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-700/80 p-5 shadow-2xl">
+      <h4 id="confirmModalTitle" class="text-base font-bold text-white">Confirm Action</h4>
+      <p id="confirmModalMessage" class="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed"></p>
+      <div class="flex items-center justify-end gap-2.5 mt-5">
+        <button id="confirmModalCancel" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium transition-colors">
+          Cancel
+        </button>
+        <button id="confirmModalOk" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-semibold transition-colors">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATION CONTAINER ==================== -->
+  <div id="toastContainer" class="fixed bottom-20 lg:bottom-6 right-4 z-50 flex flex-col gap-2 max-w-xs w-full pointer-events-none"></div>
+
+  <!-- ==================== STANDALONE APPLICATION SCRIPT (100% LOCALSTORAGE, NO FIREBASE) ==================== -->
+  <script>
+    /**
+     * HotelKhata — 100% Standalone Hotel Accounts & Staff Manager
+     * Zero Firebase, zero external backend. Uses pure JS SHA-256 + localStorage/sessionStorage.
+     */
+
+    const STORAGE_KEYS = {
+      AUTH: 'hotelkhata_owner_auth_v1',
+      DATA: 'hotelkhata_vault_data_v1',
+      SESSION: 'hotelkhata_active_session_v1'
+    };
+
+    // ==================== PURE JAVASCRIPT SHA-256 (WORKS ON file://, HTTP & HTTPS) ====================
+
+    function sha256(str) {
+      // UTF-8 encode so Unicode / special characters hash reliably
+      let ascii = unescape(encodeURIComponent(String(str)));
+      function rightRotate(value, amount) {
+        return (value >>> amount) | (value << (32 - amount));
+      }
+      const mathPow = Math.pow;
+      const maxWord = mathPow(2, 32);
+      let result = '';
+      const words = [];
+      const asciiBitLength = ascii.length * 8;
+      const hash = [];
+      const k = [];
+      let primeCounter = 0;
+      const isComposite = {};
+
+      for (let candidate = 2; primeCounter < 64; candidate++) {
+        if (!isComposite[candidate]) {
+          for (let i = 0; i < 313; i += candidate) {
+            isComposite[i] = candidate;
+          }
+          hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+          k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+        }
+      }
+
+      ascii += '\x80';
+      while ((ascii.length % 64) - 56) ascii += '\x00';
+      for (let i = 0; i < ascii.length; i++) {
+        const j = ascii.charCodeAt(i);
+        words[i >> 2] |= j << (((3 - i) % 4) * 8);
+      }
+      words[words.length] = (asciiBitLength / maxWord) | 0;
+      words[words.length] = asciiBitLength;
+
+      for (let j = 0; j < words.length;) {
+        const w = words.slice(j, (j += 16));
+        const oldHash = hash.slice(0);
+
+        for (let i = 0; i < 64; i++) {
+          const w15 = w[i - 15], w2 = w[i - 2];
+          const a = hash[0], e = hash[4];
+          const temp1 = hash[7]
+            + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+            + ((e & hash[5]) ^ ((~e) & hash[6]))
+            + k[i]
+            + (w[i] = (i < 16) ? w[i] : (
+              w[i - 16]
+              + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+              + w[i - 7]
+              + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+            ) | 0);
+          const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+            + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+
+          hash.unshift((temp1 + temp2) | 0);
+          hash[4] = (hash[4] + temp1) | 0;
+          hash.pop();
+        }
+
+        for (let i = 0; i < 8; i++) {
+          hash[i] = (hash[i] + oldHash[i]) | 0;
+        }
+      }
+
+      for (let i = 0; i < 8; i++) {
+        for (let j = 3; j + 1; j--) {
+          const b = (hash[i] >> (j * 8)) & 255;
+          result += ((b < 16) ? 0 : '') + b.toString(16);
+        }
+      }
+      return result;
+    }
+
+    // ==================== APPLICATION STATE ====================
+
+    let state = {
+      profile: {
+        hotelName: 'HotelKhata',
+        hotelCity: 'Official Owner Portal',
+        ownerName: ''
+      },
+      revenues: [],
+      expenses: [],
+      staff: [],
+      staffTx: []
+    };
+
+    let activeTab = 'dashboard';
+    let selectedMonth = getTodayISO().slice(0, 7);
+    let pendingConfirmCallback = null;
+    let deferredInstallPrompt = null;
+    let generatedIconDataURL = '';
+
+    // ==================== MOBILE APP (PWA + APK) ICON & MANIFEST ====================
+
+    function generateAppIconDataURL(size = 512) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return '';
+
+      const r = size * 0.22;
+      // Rounded square background (dark slate)
+      ctx.beginPath();
+      ctx.moveTo(r, 0);
+      ctx.lineTo(size - r, 0);
+      ctx.quadraticCurveTo(size, 0, size, r);
+      ctx.lineTo(size, size - r);
+      ctx.quadraticCurveTo(size, size, size - r, size);
+      ctx.lineTo(r, size);
+      ctx.quadraticCurveTo(0, size, 0, size - r);
+      ctx.lineTo(0, r);
+      ctx.quadraticCurveTo(0, 0, r, 0);
+      ctx.closePath();
+
+      const bgGrad = ctx.createLinearGradient(0, 0, size, size);
+      bgGrad.addColorStop(0, '#0f172a');
+      bgGrad.addColorStop(1, '#070b14');
+      ctx.fillStyle = bgGrad;
+      ctx.fill();
+
+      // Subtle emerald border glow
+      ctx.lineWidth = size * 0.04;
+      ctx.strokeStyle = '#10b981';
+      ctx.stroke();
+
+      // Emerald accent bar at bottom
+      ctx.fillStyle = '#10b981';
+      const barW = size * 0.42;
+      const barH = size * 0.045;
+      ctx.fillRect((size - barW) / 2, size * 0.74, barW, barH);
+
+      // Crisp "HK" monogram
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = `800 ${Math.round(size * 0.40)}px Inter, system-ui, -apple-system, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('HK', size / 2, size * 0.46);
+
+      return canvas.toDataURL('image/png');
+    }
+
+    function updateDynamicManifest(appName = 'HotelKhata') {
+      try {
+        if (!generatedIconDataURL) {
+          generatedIconDataURL = generateAppIconDataURL(512);
+        }
+        const icon192 = generateAppIconDataURL(192);
+
+        const fav = document.getElementById('dynamicFavicon');
+        const apple = document.getElementById('dynamicAppleIcon');
+        const preview = document.getElementById('installModalIconPreview');
+        if (fav && icon192) fav.href = icon192;
+        if (apple && generatedIconDataURL) apple.href = generatedIconDataURL;
+        if (preview && icon192) preview.src = icon192;
+
+        const manifestObj = {
+          name: `${appName} — Hotel Accounts & Staff Manager`,
+          short_name: appName.slice(0, 14),
+          description: 'Offline Hotel Accounts, Booking ID Revenue, Expenses & Staff Salary Portal',
+          start_url: '.',
+          display: 'standalone',
+          orientation: 'portrait-primary',
+          background_color: '#070b14',
+          theme_color: '#070b14',
+          icons: [
+            { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+            { src: generatedIconDataURL, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+          ]
+        };
+
+        const manifestLink = document.getElementById('dynamicManifest');
+        if (manifestLink) {
+          if (manifestLink.dataset.blobUrl) {
+            URL.revokeObjectURL(manifestLink.dataset.blobUrl);
+          }
+          const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+          const blobUrl = URL.createObjectURL(blob);
+          manifestLink.href = blobUrl;
+          manifestLink.dataset.blobUrl = blobUrl;
+        }
+      } catch (err) {
+        console.error('Manifest generation error:', err);
+      }
+    }
+
+    function initMobileAppFeatures() {
+      updateDynamicManifest(state.profile.hotelName || 'HotelKhata');
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        const btn = document.getElementById('nativePwaInstallBtn');
+        if (btn) btn.classList.remove('hidden');
+      });
+
+      window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+        const btn = document.getElementById('nativePwaInstallBtn');
+        if (btn) btn.classList.add('hidden');
+        closeInstallModal();
+        showToast('HotelKhata installed on your device!');
+      });
+    }
+
+    function openInstallModal() {
+      document.getElementById('installAppModal').classList.remove('hidden');
+    }
+
+    function closeInstallModal() {
+      document.getElementById('installAppModal').classList.add('hidden');
+    }
+
+    async function triggerNativeInstall() {
+      if (!deferredInstallPrompt) {
+        showToast('Use Chrome/Brave menu -> Add to Home Screen.', 'info');
+        return;
+      }
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      if (choice.outcome === 'accepted') {
+        showToast('Installing app to your Home Screen...');
+      }
+      deferredInstallPrompt = null;
+      document.getElementById('nativePwaInstallBtn').classList.add('hidden');
+    }
+
+    function downloadAppHTML() {
+      try {
+        const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        triggerDownload(htmlContent, 'index.html', 'text/html;charset=utf-8;');
+        showToast('App file (index.html) downloaded! Ready for Netlify or APK.');
+      } catch (err) {
+        console.error(err);
+        showToast('Could not download HTML file.', 'error');
+      }
+    }
+
+    // ==================== UTILITY FUNCTIONS ====================
+
+    function getTodayISO() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatINR(amount) {
+      const num = Number(amount) || 0;
+      const isNegative = num < 0;
+      const absNum = Math.abs(num);
+      const hasDecimals = Math.round(absNum * 100) % 100 !== 0;
+      const formatted = new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: hasDecimals ? 2 : 0,
+        maximumFractionDigits: 2
+      }).format(absNum);
+      return isNegative ? `-${formatted}` : formatted;
+    }
+
+    function formatDateShort(isoDate) {
+      if (!isoDate) return '-';
+      const parts = isoDate.split('-');
+      if (parts.length !== 3) return isoDate;
+      const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      return dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function formatMonthLabel(ym) {
+      if (!ym) return '';
+      const [y, m] = ym.split('-').map(Number);
+      const dt = new Date(y, m - 1, 1);
+      return dt.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function uid(prefix = 'id') {
+      return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    }
+
+    function getDefaultFormDate() {
+      const today = getTodayISO();
+      if (today.startsWith(selectedMonth)) return today;
+      return `${selectedMonth}-01`;
+    }
+
+    // ==================== LOCALSTORAGE PERSISTENCE ====================
+
+    function getOwnerAuth() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.AUTH);
+        return raw ? JSON.parse(raw) : null;
+      } catch (err) {
+        console.error('Auth read error:', err);
+        return null;
+      }
+    }
+
+    function saveOwnerAuth(authObj) {
+      localStorage.setItem(STORAGE_KEYS.AUTH, JSON.stringify(authObj));
+    }
+
+    function loadVaultData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.DATA);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state = {
+            profile: parsed.profile || { hotelName: 'HotelKhata', hotelCity: 'Official Owner Portal', ownerName: '' },
+            revenues: Array.isArray(parsed.revenues) ? parsed.revenues : [],
+            expenses: Array.isArray(parsed.expenses) ? parsed.expenses : [],
+            staff: Array.isArray(parsed.staff) ? parsed.staff : [],
+            staffTx: Array.isArray(parsed.staffTx) ? parsed.staffTx : []
+          };
+        }
+      } catch (err) {
+        console.error('Data load error:', err);
+      }
+    }
+
+    function saveVaultData() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.DATA, JSON.stringify(state));
+      } catch (err) {
+        console.error('Data save error:', err);
+        showToast('Storage quota warning: Please download a JSON backup.', 'error');
+      }
+    }
+
+    function setActiveSession(loginId, remember) {
+      const token = sha256(`${loginId}_${Date.now()}`);
+      const payload = JSON.stringify({ loginId, token, loggedInAt: new Date().toISOString() });
+      sessionStorage.removeItem(STORAGE_KEYS.SESSION);
+      localStorage.removeItem(STORAGE_KEYS.SESSION);
+      if (remember) {
+        localStorage.setItem(STORAGE_KEYS.SESSION, payload);
+      } else {
+        sessionStorage.setItem(STORAGE_KEYS.SESSION, payload);
+      }
+    }
+
+    function getActiveSession() {
+      try {
+        const raw = sessionStorage.getItem(STORAGE_KEYS.SESSION) || localStorage.getItem(STORAGE_KEYS.SESSION);
+        return raw ? JSON.parse(raw) : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function clearActiveSession() {
+      sessionStorage.removeItem(STORAGE_KEYS.SESSION);
+      localStorage.removeItem(STORAGE_KEYS.SESSION);
+    }
+
+    // ==================== TOAST & CONFIRM MODAL ====================
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      const colors = {
+        success: 'bg-emerald-950/95 border-emerald-500/40 text-emerald-200',
+        error: 'bg-rose-950/95 border-rose-500/40 text-rose-200',
+        info: 'bg-slate-900/95 border-sky-500/40 text-sky-200'
+      };
+      const dot = { success: 'bg-emerald-400', error: 'bg-rose-400', info: 'bg-sky-400' };
+
+      el.className = `toast-enter pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-xl text-xs sm:text-sm font-medium ${colors[type] || colors.success}`;
+      el.innerHTML = `<span class="w-2 h-2 rounded-full shrink-0 ${dot[type] || dot.success}"></span><span>${escapeHtml(message)}</span>`;
+      container.appendChild(el);
+
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(8px)';
+        el.style.transition = 'all 0.2s ease';
+        setTimeout(() => el.remove(), 220);
+      }, 2800);
+    }
+
+    function showConfirmModal(title, message, onConfirm, confirmLabel = 'Confirm', isDanger = true) {
+      document.getElementById('confirmModalTitle').textContent = title;
+      document.getElementById('confirmModalMessage').textContent = message;
+      const okBtn = document.getElementById('confirmModalOk');
+      okBtn.textContent = confirmLabel;
+      okBtn.className = isDanger
+        ? 'px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-semibold transition-colors'
+        : 'px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold transition-colors';
+
+      pendingConfirmCallback = onConfirm;
+      document.getElementById('confirmModal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').classList.add('hidden');
+      pendingConfirmCallback = null;
+    }
+
+    // ==================== STANDALONE AUTH PORTAL LOGIC ====================
+
+    function showAuthMessage(msg, type = 'error') {
+      const box = document.getElementById('authMessageBox');
+      box.textContent = msg;
+      box.classList.remove('hidden');
+      box.className = type === 'success'
+        ? 'mb-4 rounded-xl px-3.5 py-2.5 text-xs font-medium border bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+        : 'mb-4 rounded-xl px-3.5 py-2.5 text-xs font-medium border bg-rose-500/10 border-rose-500/30 text-rose-300';
+    }
+
+    function clearAuthMessage() {
+      document.getElementById('authMessageBox').classList.add('hidden');
+    }
+
+    function showAuthView(view) {
+      clearAuthMessage();
+      document.getElementById('setupForm').classList.toggle('hidden', view !== 'setup');
+      document.getElementById('loginForm').classList.toggle('hidden', view !== 'login');
+      document.getElementById('recoverForm').classList.toggle('hidden', view !== 'recover');
+
+      // Show saved hotel name on login screen if registered
+      loadVaultData();
+      const authObj = getOwnerAuth();
+      if (authObj && state.profile.hotelName) {
+        document.getElementById('authBrandTitle').textContent = state.profile.hotelName;
+        document.getElementById('authBrandSubtitle').textContent = state.profile.hotelCity || 'Official Private Hotel Portal';
+      } else {
+        document.getElementById('authBrandTitle').textContent = 'HotelKhata';
+        document.getElementById('authBrandSubtitle').textContent = 'Official Private Accounts & Staff Management Portal';
+      }
+    }
+
+    function togglePasswordVisibility(inputId) {
+      const input = document.getElementById(inputId);
+      if (input) input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function enterAuthenticatedApp() {
+      const authObj = getOwnerAuth();
+      loadVaultData();
+      document.getElementById('authPortal').classList.add('hidden');
+      document.getElementById('appShell').classList.remove('hidden');
+
+      const userEl = document.getElementById('sidebarUserEmail');
+      const displayId = authObj ? authObj.loginId : 'Owner';
+      userEl.textContent = displayId;
+      userEl.title = displayId;
+
+      applyHotelBranding();
+      switchTab(activeTab || 'dashboard');
+    }
+
+    // 1. First-Time Setup Submit
+    document.getElementById('setupForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearAuthMessage();
+
+      const hotelName = document.getElementById('setupHotelName').value.trim();
+      const ownerName = document.getElementById('setupOwnerName').value.trim();
+      const loginId = document.getElementById('setupLoginId').value.trim();
+      const password = document.getElementById('setupPassword').value;
+      const confirmPassword = document.getElementById('setupConfirmPassword').value;
+      const pin = document.getElementById('setupPin').value.trim();
+
+      if (!hotelName || !ownerName || !loginId) {
+        showAuthMessage('Please fill in Hotel Name, Owner Name, and Personal Login ID.');
+        return;
+      }
+      if (password.length < 4) {
+        showAuthMessage('Password must be at least 4 characters long.');
+        return;
+      }
+      if (password !== confirmPassword) {
+        showAuthMessage('Passwords do not match. Please re-enter.');
+        return;
+      }
+      if (!/^\d{4}$/.test(pin)) {
+        showAuthMessage('Recovery PIN must be exactly 4 numeric digits.');
+        return;
+      }
+
+      const authRecord = {
+        loginId,
+        loginIdLower: loginId.toLowerCase(),
+        passwordHash: sha256(password),
+        pinHash: sha256(pin),
+        createdAt: new Date().toISOString()
+      };
+      saveOwnerAuth(authRecord);
+
+      loadVaultData();
+      state.profile = {
+        hotelName,
+        hotelCity: 'Official Owner Portal',
+        ownerName
+      };
+      saveVaultData();
+
+      setActiveSession(loginId, true);
+      document.getElementById('setupForm').reset();
+      enterAuthenticatedApp();
+      showToast(`Welcome, ${ownerName}! Your private portal is ready.`);
+    });
+
+    // 2. Owner Login Submit
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearAuthMessage();
+
+      const authObj = getOwnerAuth();
+      if (!authObj) {
+        showAuthView('setup');
+        return;
+      }
+
+      const loginId = document.getElementById('loginId').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const remember = document.getElementById('rememberDevice').checked;
+
+      if (loginId.toLowerCase() !== authObj.loginIdLower || sha256(password) !== authObj.passwordHash) {
+        showAuthMessage('Invalid Personal Login ID or Password. Try again or use Forgot Password.');
+        return;
+      }
+
+      setActiveSession(authObj.loginId, remember);
+      document.getElementById('loginForm').reset();
+      document.getElementById('rememberDevice').checked = true;
+      enterAuthenticatedApp();
+      showToast('Signed in securely.');
+    });
+
+    // 3. Forgot Password / PIN Recovery Submit
+    document.getElementById('recoverForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearAuthMessage();
+
+      const authObj = getOwnerAuth();
+      if (!authObj) {
+        showAuthView('setup');
+        return;
+      }
+
+      const loginId = document.getElementById('recoverLoginId').value.trim();
+      const pin = document.getElementById('recoverPin').value.trim();
+      const newPass = document.getElementById('recoverNewPassword').value;
+      const confirmPass = document.getElementById('recoverConfirmPassword').value;
+
+      if (loginId.toLowerCase() !== authObj.loginIdLower) {
+        showAuthMessage('Personal Login ID does not match the registered owner account.');
+        return;
+      }
+      if (!/^\d{4}$/.test(pin) || sha256(pin) !== authObj.pinHash) {
+        showAuthMessage('Incorrect 4-digit Recovery PIN.');
+        return;
+      }
+      if (newPass.length < 4) {
+        showAuthMessage('New password must be at least 4 characters long.');
+        return;
+      }
+      if (newPass !== confirmPass) {
+        showAuthMessage('New passwords do not match.');
+        return;
+      }
+
+      authObj.passwordHash = sha256(newPass);
+      authObj.updatedAt = new Date().toISOString();
+      saveOwnerAuth(authObj);
+
+      document.getElementById('recoverForm').reset();
+      showAuthView('login');
+      showAuthMessage('Password reset successfully! Please sign in with your new password.', 'success');
+    });
+
+    function handleLogout() {
+      showConfirmModal(
+        'Logout of Portal?',
+        'All your hotel records remain safely saved on this device. You will need your Personal Login ID and Password to sign back in.',
+        () => {
+          clearActiveSession();
+          document.getElementById('appShell').classList.add('hidden');
+          document.getElementById('authPortal').classList.remove('hidden');
+          showAuthView('login');
+          showToast('Logged out successfully.', 'info');
+        },
+        'Logout',
+        true
+      );
+    }
+
+    // ==================== HOTEL PROFILE & SECURITY SETTINGS MODAL ====================
+
+    function applyHotelBranding() {
+      const hName = state.profile.hotelName || 'HotelKhata';
+      const hSub = state.profile.hotelCity || 'Official Owner Portal';
+      document.title = `${hName} — Accounts & Staff Portal`;
+      document.getElementById('sidebarHotelName').textContent = hName;
+      document.getElementById('sidebarHotelSub').textContent = hSub;
+      document.getElementById('headerHotelBadge').textContent = hName;
+      document.getElementById('reportHotelHeading').textContent = `${hName} — Monthly Profit & Loss`;
+      updateDynamicManifest(hName);
+    }
+
+    function openProfileModal() {
+      const authObj = getOwnerAuth();
+      document.getElementById('profileHotelName').value = state.profile.hotelName || '';
+      document.getElementById('profileHotelCity').value = state.profile.hotelCity || '';
+      document.getElementById('profileOwnerName').value = state.profile.ownerName || '';
+      document.getElementById('profileLoginId').value = authObj ? authObj.loginId : '';
+      document.getElementById('profileNewPassword').value = '';
+      document.getElementById('profileNewPin').value = '';
+      document.getElementById('profileModal').classList.remove('hidden');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').classList.add('hidden');
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const hotelName = document.getElementById('profileHotelName').value.trim();
+      const hotelCity = document.getElementById('profileHotelCity').value.trim();
+      const ownerName = document.getElementById('profileOwnerName').value.trim();
+      const newLoginId = document.getElementById('profileLoginId').value.trim();
+      const newPass = document.getElementById('profileNewPassword').value;
+      const newPin = document.getElementById('profileNewPin').value.trim();
+
+      if (!hotelName || !newLoginId) {
+        showToast('Hotel Name and Personal Login ID are required.', 'error');
+        return;
+      }
+      if (newPass && newPass.length < 4) {
+        showToast('New password must be at least 4 characters.', 'error');
+        return;
+      }
+      if (newPin && !/^\d{4}$/.test(newPin)) {
+        showToast('New Recovery PIN must be exactly 4 digits.', 'error');
+        return;
+      }
+
+      // Save profile
+      state.profile = {
+        hotelName,
+        hotelCity: hotelCity || 'Official Owner Portal',
+        ownerName
+      };
+      saveVaultData();
+
+      // Update auth credentials
+      const authObj = getOwnerAuth();
+      if (authObj) {
+        authObj.loginId = newLoginId;
+        authObj.loginIdLower = newLoginId.toLowerCase();
+        if (newPass) authObj.passwordHash = sha256(newPass);
+        if (newPin) authObj.pinHash = sha256(newPin);
+        authObj.updatedAt = new Date().toISOString();
+        saveOwnerAuth(authObj);
+
+        const userEl = document.getElementById('sidebarUserEmail');
+        userEl.textContent = newLoginId;
+        userEl.title = newLoginId;
+      }
+
+      applyHotelBranding();
+      closeProfileModal();
+      showToast('Hotel profile & security settings updated!');
+    });
+
+    // ==================== NAVIGATION ====================
+
+    const TAB_TITLES = {
+      dashboard: 'Dashboard',
+      revenue: 'Daily Revenue',
+      expenses: 'Expenses',
+      staff: 'Staff Salary & Advance',
+      reports: 'Reports & Backup'
+    };
+
+    function switchTab(tabName) {
+      activeTab = tabName;
+
+      document.querySelectorAll('.tab-section').forEach(sec => {
+        sec.classList.toggle('hidden', sec.id !== `tab-${tabName}`);
+      });
+
+      document.getElementById('headerTitle').textContent = TAB_TITLES[tabName] || 'HotelKhata';
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const isActive = btn.dataset.tab === tabName;
+        btn.className = isActive
+          ? 'nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 transition-all'
+          : 'nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800/70 border border-transparent transition-all';
+      });
+
+      document.querySelectorAll('.nav-btn-mobile').forEach(btn => {
+        const isActive = btn.dataset.tab === tabName;
+        btn.className = isActive
+          ? 'nav-btn-mobile flex flex-col items-center justify-center py-2 rounded-2xl text-[10px] font-semibold text-emerald-400 bg-emerald-500/15 border border-emerald-500/20 transition-all'
+          : 'nav-btn-mobile flex flex-col items-center justify-center py-2 rounded-2xl text-[10px] font-medium text-slate-400 hover:text-slate-200 border border-transparent transition-all';
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      renderAll();
+    }
+
+    // ==================== RENDER ALL ====================
+
+    function renderAll() {
+      renderDashboard();
+      renderRevenueTable();
+      renderExpenseTable();
+      populateStaffDropdowns();
+      renderStaffLedger();
+      renderStaffTxTable();
+      renderReports();
+    }
+
+    // ==================== MODULE 1: DASHBOARD RENDER ====================
+
+    function renderDashboard() {
+      const today = getTodayISO();
+      const monthStr = selectedMonth;
+
+      const totalRecords = state.revenues.length + state.expenses.length + state.staff.length + state.staffTx.length;
+      document.getElementById('emptyWelcomeBanner').classList.toggle('hidden', totalRecords > 0);
+
+      // Today's metrics
+      const todayRevs = state.revenues.filter(r => r.date === today);
+      const todayExps = state.expenses.filter(e => e.date === today);
+      const todayStaff = state.staffTx.filter(t => t.date === today);
+
+      const todayRevSum = todayRevs.reduce((s, r) => s + Number(r.amount || 0), 0);
+      const todayExpSum = todayExps.reduce((s, e) => s + Number(e.amount || 0), 0)
+                        + todayStaff.reduce((s, t) => s + Number(t.amount || 0), 0);
+      const todayNet = todayRevSum - todayExpSum;
+
+      document.getElementById('dashTodayRev').textContent = formatINR(todayRevSum);
+      document.getElementById('dashTodayRevSub').textContent = `${todayRevs.length} ${todayRevs.length === 1 ? 'entry' : 'entries'} today`;
+
+      document.getElementById('dashTodayExp').textContent = formatINR(todayExpSum);
+      document.getElementById('dashTodayExpSub').textContent = `${todayExps.length} exp • ${todayStaff.length} staff pay`;
+
+      const todayNetEl = document.getElementById('dashTodayNet');
+      todayNetEl.textContent = formatINR(todayNet);
+      todayNetEl.className = `text-lg sm:text-2xl font-bold mt-2 tracking-tight ${todayNet >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+
+      // Selected Month metrics
+      const mRevs = state.revenues.filter(r => (r.date || '').startsWith(monthStr));
+      const mExps = state.expenses.filter(e => (e.date || '').startsWith(monthStr));
+      const mStaff = state.staffTx.filter(t => (t.date || '').startsWith(monthStr));
+
+      const mRevSum = mRevs.reduce((s, r) => s + Number(r.amount || 0), 0);
+      const mOpsExpSum = mExps.reduce((s, e) => s + Number(e.amount || 0), 0);
+      const mStaffSum = mStaff.reduce((s, t) => s + Number(t.amount || 0), 0);
+      const mTotalExp = mOpsExpSum + mStaffSum;
+      const mNet = mRevSum - mTotalExp;
+      const margin = mRevSum > 0 ? ((mNet / mRevSum) * 100).toFixed(1) : '0.0';
+
+      document.getElementById('dashMonthBadge1').textContent = formatMonthLabel(monthStr).split(' ')[0];
+      document.getElementById('dashMonthRev').textContent = formatINR(mRevSum);
+      document.getElementById('dashMonthBookings').textContent = `${mRevs.length} ${mRevs.length === 1 ? 'booking' : 'bookings'} / entries`;
+
+      document.getElementById('dashMonthExp').textContent = formatINR(mTotalExp);
+      document.getElementById('dashMonthExpBreakdown').textContent = `Ops: ${formatINR(mOpsExpSum)} • Staff: ${formatINR(mStaffSum)}`;
+
+      const netEl = document.getElementById('dashMonthNet');
+      netEl.textContent = formatINR(mNet);
+      netEl.className = `text-lg sm:text-2xl font-bold mt-2 tracking-tight ${mNet > 0 ? 'text-emerald-400' : mNet < 0 ? 'text-rose-400' : 'text-slate-200'}`;
+
+      const badge = document.getElementById('dashProfitBadge');
+      if (mNet > 0) {
+        badge.textContent = 'Profit';
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400';
+      } else if (mNet < 0) {
+        badge.textContent = 'Loss';
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/15 text-rose-400';
+      } else {
+        badge.textContent = 'Break-even';
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-300';
+      }
+      document.getElementById('dashMonthMargin').textContent = `Net margin: ${margin}%`;
+
+      // Progress Bars Comparison
+      const maxVal = Math.max(mRevSum, mOpsExpSum, mStaffSum, 1);
+      document.getElementById('barRevVal').textContent = formatINR(mRevSum);
+      document.getElementById('barExpVal').textContent = formatINR(mOpsExpSum);
+      document.getElementById('barStaffVal').textContent = formatINR(mStaffSum);
+
+      document.getElementById('barRevFill').style.width = `${Math.min(100, (mRevSum / maxVal) * 100)}%`;
+      document.getElementById('barExpFill').style.width = `${Math.min(100, (mOpsExpSum / maxVal) * 100)}%`;
+      document.getElementById('barStaffFill').style.width = `${Math.min(100, (mStaffSum / maxVal) * 100)}%`;
+
+      // Payment Mode Breakdown
+      const normalizeMode = (m) => {
+        if (!m || m === 'Cash') return 'Cash';
+        if (m === 'UPI') return 'UPI';
+        if (m === 'OYO Prepaid') return 'OYO Prepaid';
+        return 'Card / Bank';
+      };
+
+      const modes = {
+        'Cash': { in: 0, out: 0, desc: 'Counter cash in hand' },
+        'UPI': { in: 0, out: 0, desc: 'PhonePe / GPay / Paytm' },
+        'OYO Prepaid': { in: 0, out: 0, desc: 'OYO / OTA prepaid payouts' },
+        'Card / Bank': { in: 0, out: 0, desc: 'Card swipe / Bank transfer' }
+      };
+
+      mRevs.forEach(r => { modes[normalizeMode(r.paymentMode)].in += Number(r.amount || 0); });
+      mExps.forEach(e => { modes[normalizeMode(e.paymentMode)].out += Number(e.amount || 0); });
+      mStaff.forEach(t => { modes[normalizeMode(t.paymentMode)].out += Number(t.amount || 0); });
+
+      const modeContainer = document.getElementById('paymentModeCards');
+      modeContainer.innerHTML = Object.entries(modes).map(([name, data]) => {
+        const net = data.in - data.out;
+        const pct = mRevSum > 0 ? Math.round((data.in / mRevSum) * 100) : 0;
+        return `
+          <div class="rounded-xl bg-slate-950/70 border border-slate-800/80 p-3.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-semibold text-white">${name}</p>
+                <p class="text-[11px] text-slate-500">${data.desc}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold ${net >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${formatINR(net)}</p>
+                <p class="text-[10px] text-slate-400">Net • ${pct}% of rev</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 mt-2.5 pt-2.5 border-t border-slate-800/70 text-xs">
+              <div class="text-slate-400">In: <span class="text-emerald-400 font-semibold">${formatINR(data.in)}</span></div>
+              <div class="text-slate-400 text-right">Out: <span class="text-rose-400 font-semibold">${formatINR(data.out)}</span></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Recent Activity List
+      const combined = [
+        ...mRevs.map(r => ({
+          date: r.date,
+          title: r.bookingId ? `${r.bookingId} — ${r.category}` : r.category,
+          sub: `${r.paymentMode}${r.note ? ` • ${r.note}` : ''}`,
+          amount: Number(r.amount || 0),
+          sign: '+',
+          badge: 'Revenue',
+          badgeClass: 'bg-emerald-500/10 text-emerald-400',
+          amountClass: 'text-emerald-400',
+          ts: r.id
+        })),
+        ...mExps.map(e => ({
+          date: e.date,
+          title: e.category,
+          sub: `${e.type} • ${e.paymentMode}${e.note ? ` • ${e.note}` : ''}`,
+          amount: Number(e.amount || 0),
+          sign: '-',
+          badge: 'Expense',
+          badgeClass: 'bg-rose-500/10 text-rose-400',
+          amountClass: 'text-rose-400',
+          ts: e.id
+        })),
+        ...mStaff.map(t => ({
+          date: t.date,
+          title: `${getStaffName(t.staffId, t.staffNameSnapshot)} (${t.type})`,
+          sub: `${t.paymentMode}${t.note ? ` • ${t.note}` : ''}`,
+          amount: Number(t.amount || 0),
+          sign: '-',
+          badge: 'Staff',
+          badgeClass: 'bg-amber-500/10 text-amber-400',
+          amountClass: 'text-amber-400',
+          ts: t.id
+        }))
+      ].sort((a, b) => b.date.localeCompare(a.date) || String(b.ts).localeCompare(String(a.ts)))
+       .slice(0, 6);
+
+      const recentContainer = document.getElementById('dashRecentList');
+      if (combined.length === 0) {
+        recentContainer.innerHTML = `<p class="text-xs text-slate-500 py-6 text-center">No transactions recorded for ${formatMonthLabel(monthStr)} yet.</p>`;
+      } else {
+        recentContainer.innerHTML = combined.map(item => `
+          <div class="py-3 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold ${item.badgeClass}">${item.badge}</span>
+                <p class="text-sm font-medium text-slate-100 truncate">${escapeHtml(item.title)}</p>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5 truncate">${formatDateShort(item.date)} • ${escapeHtml(item.sub)}</p>
+            </div>
+            <p class="text-sm font-bold shrink-0 ${item.amountClass}">${item.sign}${formatINR(item.amount)}</p>
+          </div>
+        `).join('');
+      }
+    }
+
+    // ==================== MODULE 2: REVENUE CRUD ====================
+
+    function resetRevenueForm() {
+      document.getElementById('revenueForm').reset();
+      document.getElementById('revId').value = '';
+      document.getElementById('revDate').value = getDefaultFormDate();
+      document.getElementById('revFormTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span>Add Daily Revenue';
+      document.getElementById('revSubmitBtn').textContent = 'Save Revenue Entry';
+      document.getElementById('revCancelEditBtn').classList.add('hidden');
+    }
+
+    document.getElementById('revenueForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const existingId = document.getElementById('revId').value;
+      const entry = {
+        id: existingId || uid('rev'),
+        date: document.getElementById('revDate').value,
+        bookingId: document.getElementById('revBookingId').value.trim(),
+        category: document.getElementById('revCategory').value,
+        paymentMode: document.getElementById('revMode').value,
+        amount: Number(document.getElementById('revAmount').value),
+        note: document.getElementById('revNote').value.trim(),
+        updatedAt: new Date().toISOString()
+      };
+
+      if (!entry.date || !entry.bookingId || entry.amount <= 0) {
+        showToast('Please enter a valid date, Booking ID, and amount.', 'error');
+        return;
+      }
+
+      if (existingId) {
+        const idx = state.revenues.findIndex(r => r.id === existingId);
+        if (idx !== -1) state.revenues[idx] = entry;
+      } else {
+        state.revenues.push(entry);
+      }
+
+      saveVaultData();
+      resetRevenueForm();
+      renderAll();
+      showToast(existingId ? 'Revenue entry updated.' : 'Revenue entry saved.');
+    });
+
+    function editRevenue(id) {
+      const item = state.revenues.find(r => r.id === id);
+      if (!item) return;
+      document.getElementById('revId').value = item.id;
+      document.getElementById('revDate').value = item.date;
+      document.getElementById('revBookingId').value = item.bookingId || '';
+      document.getElementById('revCategory').value = item.category;
+      document.getElementById('revMode').value = item.paymentMode;
+      document.getElementById('revAmount').value = item.amount;
+      document.getElementById('revNote').value = item.note || '';
+
+      document.getElementById('revFormTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span>Edit Revenue Entry';
+      document.getElementById('revSubmitBtn').textContent = 'Update Revenue Entry';
+      document.getElementById('revCancelEditBtn').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteRevenue(id) {
+      showConfirmModal(
+        'Delete Revenue Entry?',
+        'This revenue record will be permanently deleted.',
+        () => {
+          state.revenues = state.revenues.filter(r => r.id !== id);
+          saveVaultData();
+          renderAll();
+          showToast('Revenue entry deleted.', 'info');
+        },
+        'Delete'
+      );
+    }
+
+    function renderRevenueTable() {
+      const searchQuery = (document.getElementById('revSearchBookingId').value || '').trim().toLowerCase();
+      const catFilter = document.getElementById('revFilterCategory').value;
+      const modeFilter = document.getElementById('revFilterMode').value;
+
+      const list = state.revenues
+        .filter(r => (r.date || '').startsWith(selectedMonth))
+        .filter(r => !searchQuery || (r.bookingId || '').toLowerCase().includes(searchQuery))
+        .filter(r => catFilter === 'ALL' || r.category === catFilter)
+        .filter(r => modeFilter === 'ALL' || r.paymentMode === modeFilter)
+        .sort((a, b) => b.date.localeCompare(a.date) || String(b.id).localeCompare(String(a.id)));
+
+      const total = list.reduce((s, r) => s + Number(r.amount || 0), 0);
+
+      document.getElementById('revFilteredTotal').textContent = formatINR(total);
+      document.getElementById('revFilteredCount').textContent = list.length;
+
+      const tbody = document.getElementById('revenueTableBody');
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-slate-500">No revenue records found for ${formatMonthLabel(selectedMonth)}.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(r => `
+        <tr class="hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-4 whitespace-nowrap text-slate-300 text-xs font-medium">${formatDateShort(r.date)}</td>
+          <td class="py-3 px-4 whitespace-nowrap">
+            <span class="px-2 py-1 rounded-lg text-xs font-mono font-semibold bg-slate-800 text-slate-100 border border-slate-700/80">${escapeHtml(r.bookingId || '-')}</span>
+          </td>
+          <td class="py-3 px-4 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-300">${escapeHtml(r.category)}</span>
+          </td>
+          <td class="py-3 px-4 whitespace-nowrap text-slate-300 text-xs">${escapeHtml(r.paymentMode)}</td>
+          <td class="py-3 px-4 text-slate-400 text-xs max-w-[180px] truncate" title="${escapeHtml(r.note)}">${escapeHtml(r.note || '-')}</td>
+          <td class="py-3 px-4 whitespace-nowrap text-right font-bold text-emerald-400">${formatINR(r.amount)}</td>
+          <td class="py-3 px-4 whitespace-nowrap text-right">
+            <div class="inline-flex items-center gap-1.5">
+              <button onclick="editRevenue('${r.id}')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors">Edit</button>
+              <button onclick="deleteRevenue('${r.id}')" class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-medium transition-colors">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ==================== MODULE 3: EXPENSES CRUD ====================
+
+    function resetExpenseForm() {
+      document.getElementById('expenseForm').reset();
+      document.getElementById('expId').value = '';
+      document.getElementById('expDate').value = getDefaultFormDate();
+      document.getElementById('expFormTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span>Add Expense';
+      document.getElementById('expSubmitBtn').textContent = 'Save Expense Entry';
+      document.getElementById('expCancelEditBtn').classList.add('hidden');
+    }
+
+    document.getElementById('expenseForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const existingId = document.getElementById('expId').value;
+      const entry = {
+        id: existingId || uid('exp'),
+        date: document.getElementById('expDate').value,
+        type: document.getElementById('expType').value,
+        category: document.getElementById('expCategory').value,
+        paymentMode: document.getElementById('expMode').value,
+        amount: Number(document.getElementById('expAmount').value),
+        note: document.getElementById('expNote').value.trim(),
+        updatedAt: new Date().toISOString()
+      };
+
+      if (!entry.date || entry.amount <= 0) {
+        showToast('Please enter a valid date and amount.', 'error');
+        return;
+      }
+
+      if (existingId) {
+        const idx = state.expenses.findIndex(x => x.id === existingId);
+        if (idx !== -1) state.expenses[idx] = entry;
+      } else {
+        state.expenses.push(entry);
+      }
+
+      saveVaultData();
+      resetExpenseForm();
+      renderAll();
+      showToast(existingId ? 'Expense entry updated.' : 'Expense entry saved.');
+    });
+
+    function editExpense(id) {
+      const item = state.expenses.find(x => x.id === id);
+      if (!item) return;
+      document.getElementById('expId').value = item.id;
+      document.getElementById('expDate').value = item.date;
+      document.getElementById('expType').value = item.type;
+      document.getElementById('expCategory').value = item.category;
+      document.getElementById('expMode').value = item.paymentMode;
+      document.getElementById('expAmount').value = item.amount;
+      document.getElementById('expNote').value = item.note || '';
+
+      document.getElementById('expFormTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span>Edit Expense Entry';
+      document.getElementById('expSubmitBtn').textContent = 'Update Expense Entry';
+      document.getElementById('expCancelEditBtn').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteExpense(id) {
+      showConfirmModal(
+        'Delete Expense Entry?',
+        'This expense record will be permanently removed.',
+        () => {
+          state.expenses = state.expenses.filter(x => x.id !== id);
+          saveVaultData();
+          renderAll();
+          showToast('Expense deleted.', 'info');
+        },
+        'Delete'
+      );
+    }
+
+    function renderExpenseTable() {
+      const typeFilter = document.getElementById('expFilterType').value;
+      const catFilter = document.getElementById('expFilterCategory').value;
+
+      const list = state.expenses
+        .filter(x => (x.date || '').startsWith(selectedMonth))
+        .filter(x => typeFilter === 'ALL' || x.type === typeFilter)
+        .filter(x => catFilter === 'ALL' || x.category === catFilter)
+        .sort((a, b) => b.date.localeCompare(a.date) || String(b.id).localeCompare(String(a.id)));
+
+      const total = list.reduce((s, x) => s + Number(x.amount || 0), 0);
+      document.getElementById('expFilteredTotal').textContent = formatINR(total);
+      document.getElementById('expFilteredCount').textContent = list.length;
+
+      const tbody = document.getElementById('expenseTableBody');
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-slate-500">No expense records found for ${formatMonthLabel(selectedMonth)}.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(x => `
+        <tr class="hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-4 whitespace-nowrap text-slate-300 text-xs font-medium">${formatDateShort(x.date)}</td>
+          <td class="py-3 px-4 whitespace-nowrap">
+            <span class="px-2 py-0.5 rounded-md text-[11px] font-medium ${x.type === 'Monthly Fixed' ? 'bg-purple-500/15 text-purple-300' : 'bg-slate-800 text-slate-300'}">${escapeHtml(x.type)}</span>
+          </td>
+          <td class="py-3 px-4 whitespace-nowrap text-slate-200 text-xs font-medium">${escapeHtml(x.category)}</td>
+          <td class="py-3 px-4 whitespace-nowrap text-slate-300 text-xs">${escapeHtml(x.paymentMode)}</td>
+          <td class="py-3 px-4 text-slate-400 text-xs max-w-[180px] truncate" title="${escapeHtml(x.note)}">${escapeHtml(x.note || '-')}</td>
+          <td class="py-3 px-4 whitespace-nowrap text-right font-bold text-rose-400">${formatINR(x.amount)}</td>
+          <td class="py-3 px-4 whitespace-nowrap text-right">
+            <div class="inline-flex items-center gap-1.5">
+              <button onclick="editExpense('${x.id}')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors">Edit</button>
+              <button onclick="deleteExpense('${x.id}')" class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-medium transition-colors">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ==================== MODULE 4: STAFF & SALARY CRUD ====================
+
+    function getStaffName(staffId, fallback = 'Former Staff') {
+      const found = state.staff.find(s => s.id === staffId);
+      return found ? found.name : (fallback || 'Former Staff');
+    }
+
+    function resetStaffForm() {
+      document.getElementById('staffForm').reset();
+      document.getElementById('staffId').value = '';
+      document.getElementById('staffFormTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-sky-400"></span>Add Staff Member';
+      document.getElementById('staffSubmitBtn').textContent = 'Save Staff Member';
+      document.getElementById('staffCancelEditBtn').classList.add('hidden');
+    }
+
+    document.getElementById('staffForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const existingId = document.getElementById('staffId').value;
+      const member = {
+        id: existingId || uid('stf'),
+        name: document.getElementById('staffName').value.trim(),
+        role: document.getElementById('staffRole').value,
+        phone: document.getElementById('staffPhone').value.trim(),
+        monthlySalary: Number(document.getElementById('staffSalary').value),
+        updatedAt: new Date().toISOString()
+      };
+
+      if (!member.name || member.monthlySalary < 0) {
+        showToast('Please enter a valid staff name and salary.', 'error');
+        return;
+      }
+
+      if (existingId) {
+        const idx = state.staff.findIndex(s => s.id === existingId);
+        if (idx !== -1) state.staff[idx] = member;
+      } else {
+        state.staff.push(member);
+      }
+
+      saveVaultData();
+      resetStaffForm();
+      renderAll();
+      showToast(existingId ? 'Staff member updated.' : 'Staff member added.');
+    });
+
+    function editStaff(id) {
+      const s = state.staff.find(x => x.id === id);
+      if (!s) return;
+      document.getElementById('staffId').value = s.id;
+      document.getElementById('staffName').value = s.name;
+      document.getElementById('staffRole').value = s.role;
+      document.getElementById('staffPhone').value = s.phone || '';
+      document.getElementById('staffSalary').value = s.monthlySalary;
+
+      document.getElementById('staffFormTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span>Edit Staff Member';
+      document.getElementById('staffSubmitBtn').textContent = 'Update Staff Member';
+      document.getElementById('staffCancelEditBtn').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteStaff(id) {
+      const s = state.staff.find(x => x.id === id);
+      showConfirmModal(
+        `Remove ${s ? s.name : 'Staff Member'}?`,
+        'They will be removed from the active staff list. Past payment history will remain intact for accurate monthly accounting.',
+        () => {
+          state.staff = state.staff.filter(x => x.id !== id);
+          saveVaultData();
+          renderAll();
+          showToast('Staff member removed.', 'info');
+        },
+        'Remove'
+      );
+    }
+
+    function quickPayStaff(staffId, pendingAmount) {
+      document.getElementById('staffTxStaffId').value = staffId;
+      document.getElementById('staffTxDate').value = getDefaultFormDate();
+      document.getElementById('staffTxType').value = pendingAmount > 0 ? 'Salary Payment' : 'Advance';
+      document.getElementById('staffTxAmount').value = pendingAmount > 0 ? pendingAmount : '';
+      document.getElementById('staffTxAmount').focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetStaffTxForm() {
+      document.getElementById('staffTxForm').reset();
+      document.getElementById('staffTxId').value = '';
+      document.getElementById('staffTxDate').value = getDefaultFormDate();
+      document.getElementById('staffTxFormTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span>Record Salary / Advance Payment';
+      document.getElementById('staffTxSubmitBtn').textContent = 'Record Payment';
+      document.getElementById('staffTxCancelEditBtn').classList.add('hidden');
+    }
+
+    document.getElementById('staffTxForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const existingId = document.getElementById('staffTxId').value;
+      const staffId = document.getElementById('staffTxStaffId').value;
+      if (!staffId) {
+        showToast('Please add and select a staff member first.', 'error');
+        return;
+      }
+
+      const tx = {
+        id: existingId || uid('stx'),
+        staffId,
+        staffNameSnapshot: getStaffName(staffId),
+        date: document.getElementById('staffTxDate').value,
+        type: document.getElementById('staffTxType').value,
+        paymentMode: document.getElementById('staffTxMode').value,
+        amount: Number(document.getElementById('staffTxAmount').value),
+        note: document.getElementById('staffTxNote').value.trim(),
+        updatedAt: new Date().toISOString()
+      };
+
+      if (!tx.date || tx.amount <= 0) {
+        showToast('Please enter a valid date and amount.', 'error');
+        return;
+      }
+
+      if (existingId) {
+        const idx = state.staffTx.findIndex(t => t.id === existingId);
+        if (idx !== -1) state.staffTx[idx] = tx;
+      } else {
+        state.staffTx.push(tx);
+      }
+
+      saveVaultData();
+      resetStaffTxForm();
+      renderAll();
+      showToast(existingId ? 'Staff payment updated.' : `${tx.type} recorded for ${tx.staffNameSnapshot}.`);
+    });
+
+    function editStaffTx(id) {
+      const tx = state.staffTx.find(t => t.id === id);
+      if (!tx) return;
+      document.getElementById('staffTxId').value = tx.id;
+      document.getElementById('staffTxStaffId').value = tx.staffId;
+      document.getElementById('staffTxDate').value = tx.date;
+      document.getElementById('staffTxType').value = tx.type;
+      document.getElementById('staffTxMode').value = tx.paymentMode;
+      document.getElementById('staffTxAmount').value = tx.amount;
+      document.getElementById('staffTxNote').value = tx.note || '';
+
+      document.getElementById('staffTxFormTitle').innerHTML = '<span class="w-2 h-2 rounded-full bg-sky-400"></span>Edit Staff Payment';
+      document.getElementById('staffTxSubmitBtn').textContent = 'Update Payment';
+      document.getElementById('staffTxCancelEditBtn').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteStaffTx(id) {
+      showConfirmModal(
+        'Delete Staff Payment?',
+        'This advance or salary payment record will be permanently deleted.',
+        () => {
+          state.staffTx = state.staffTx.filter(t => t.id !== id);
+          saveVaultData();
+          renderAll();
+          showToast('Staff payment deleted.', 'info');
+        },
+        'Delete'
+      );
+    }
+
+    function populateStaffDropdowns() {
+      const formSelect = document.getElementById('staffTxStaffId');
+      const filterSelect = document.getElementById('staffTxFilterStaff');
+      const prevFormVal = formSelect.value;
+      const prevFilterVal = filterSelect.value;
+
+      const sortedStaff = [...state.staff].sort((a, b) => a.name.localeCompare(b.name));
+
+      if (sortedStaff.length === 0) {
+        formSelect.innerHTML = '<option value="">-- Add Staff First --</option>';
+      } else {
+        formSelect.innerHTML = '<option value="">-- Choose Staff --</option>' +
+          sortedStaff.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (${escapeHtml(s.role)})</option>`).join('');
+      }
+      if (prevFormVal && sortedStaff.some(s => s.id === prevFormVal)) {
+        formSelect.value = prevFormVal;
+      }
+
+      filterSelect.innerHTML = '<option value="ALL">All Staff</option>' +
+        sortedStaff.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+      if (prevFilterVal && (prevFilterVal === 'ALL' || sortedStaff.some(s => s.id === prevFilterVal))) {
+        filterSelect.value = prevFilterVal;
+      }
+    }
+
+    function renderStaffLedger() {
+      const tbody = document.getElementById('staffLedgerBody');
+      const monthTx = state.staffTx.filter(t => (t.date || '').startsWith(selectedMonth));
+
+      if (state.staff.length === 0) {
+        document.getElementById('ledgerTotalSalary').textContent = '₹0';
+        document.getElementById('ledgerTotalPending').textContent = '₹0';
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-slate-500">No staff members added yet. Add your hotel staff above to track salary & advances.</td></tr>`;
+        return;
+      }
+
+      let totalPayroll = 0;
+      let totalPending = 0;
+      const sortedStaff = [...state.staff].sort((a, b) => a.name.localeCompare(b.name));
+
+      tbody.innerHTML = sortedStaff.map(s => {
+        const sTx = monthTx.filter(t => t.staffId === s.id);
+        const adv = sTx.filter(t => t.type === 'Advance').reduce((sum, t) => sum + Number(t.amount || 0), 0);
+        const salPaid = sTx.filter(t => t.type === 'Salary Payment').reduce((sum, t) => sum + Number(t.amount || 0), 0);
+        const salary = Number(s.monthlySalary || 0);
+        const pending = salary - (adv + salPaid);
+
+        totalPayroll += salary;
+        if (pending > 0) totalPending += pending;
+
+        let statusBadge = '';
+        if (pending === 0) {
+          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-400">Settled</span>';
+        } else if (pending > 0) {
+          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-500/15 text-rose-400">Pending</span>';
+        } else {
+          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-400">Extra Paid</span>';
+        }
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-3 px-4">
+              <p class="font-semibold text-white text-sm">${escapeHtml(s.name)}</p>
+              <p class="text-[11px] text-slate-400">${escapeHtml(s.role)}${s.phone ? ` • ${escapeHtml(s.phone)}` : ''}</p>
+            </td>
+            <td class="py-3 px-4 whitespace-nowrap text-right font-medium text-slate-200">${formatINR(salary)}</td>
+            <td class="py-3 px-4 whitespace-nowrap text-right font-medium text-amber-400">${formatINR(adv)}</td>
+            <td class="py-3 px-4 whitespace-nowrap text-right font-medium text-emerald-400">${formatINR(salPaid)}</td>
+            <td class="py-3 px-4 whitespace-nowrap text-right font-bold ${pending > 0 ? 'text-rose-400' : pending < 0 ? 'text-amber-400' : 'text-emerald-400'}">${formatINR(pending)}</td>
+            <td class="py-3 px-4 whitespace-nowrap text-center">${statusBadge}</td>
+            <td class="py-3 px-4 whitespace-nowrap text-right">
+              <div class="inline-flex items-center gap-1.5">
+                <button onclick="quickPayStaff('${s.id}', ${pending})" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 text-xs font-semibold transition-colors">Pay</button>
+                <button onclick="editStaff('${s.id}')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors">Edit</button>
+                <button onclick="deleteStaff('${s.id}')" class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-medium transition-colors">Del</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('ledgerTotalSalary').textContent = formatINR(totalPayroll);
+      document.getElementById('ledgerTotalPending').textContent = formatINR(totalPending);
+    }
+
+    function renderStaffTxTable() {
+      const staffFilter = document.getElementById('staffTxFilterStaff').value;
+      const list = state.staffTx
+        .filter(t => (t.date || '').startsWith(selectedMonth))
+        .filter(t => staffFilter === 'ALL' || t.staffId === staffFilter)
+        .sort((a, b) => b.date.localeCompare(a.date) || String(b.id).localeCompare(String(a.id)));
+
+      const tbody = document.getElementById('staffTxTableBody');
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-slate-500">No staff payments recorded for ${formatMonthLabel(selectedMonth)}.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(t => `
+        <tr class="hover:bg-slate-800/40 transition-colors">
+          <td class="py-3 px-4 whitespace-nowrap text-slate-300 text-xs font-medium">${formatDateShort(t.date)}</td>
+          <td class="py-3 px-4 whitespace-nowrap text-white text-xs font-semibold">${escapeHtml(getStaffName(t.staffId, t.staffNameSnapshot))}</td>
+          <td class="py-3 px-4 whitespace-nowrap">
+            <span class="px-2 py-0.5 rounded-md text-[11px] font-medium ${t.type === 'Advance' ? 'bg-amber-500/15 text-amber-300' : 'bg-emerald-500/15 text-emerald-300'}">${escapeHtml(t.type)}</span>
+          </td>
+          <td class="py-3 px-4 whitespace-nowrap text-slate-300 text-xs">${escapeHtml(t.paymentMode)}</td>
+          <td class="py-3 px-4 text-slate-400 text-xs max-w-[180px] truncate" title="${escapeHtml(t.note)}">${escapeHtml(t.note || '-')}</td>
+          <td class="py-3 px-4 whitespace-nowrap text-right font-bold text-amber-400">${formatINR(t.amount)}</td>
+          <td class="py-3 px-4 whitespace-nowrap text-right">
+            <div class="inline-flex items-center gap-1.5">
+              <button onclick="editStaffTx('${t.id}')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors">Edit</button>
+              <button onclick="deleteStaffTx('${t.id}')" class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-medium transition-colors">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ==================== MODULE 5: REPORTS, CSV EXPORTS & JSON BACKUP ====================
+
+    function renderReports() {
+      const mLabel = formatMonthLabel(selectedMonth);
+      document.getElementById('reportMonthLabel').textContent = `Statement for ${mLabel}`;
+
+      const mRevs = state.revenues.filter(r => (r.date || '').startsWith(selectedMonth));
+      const mExps = state.expenses.filter(e => (e.date || '').startsWith(selectedMonth));
+      const mStaff = state.staffTx.filter(t => (t.date || '').startsWith(selectedMonth));
+
+      const revMap = {};
+      mRevs.forEach(r => { revMap[r.category] = (revMap[r.category] || 0) + Number(r.amount || 0); });
+      const totalRev = mRevs.reduce((s, r) => s + Number(r.amount || 0), 0);
+
+      document.getElementById('reportRevBreakdown').innerHTML = Object.keys(revMap).length
+        ? Object.entries(revMap).map(([k, v]) => `<div class="flex justify-between"><span class="text-slate-400">${escapeHtml(k)}</span><span class="font-medium text-slate-200">${formatINR(v)}</span></div>`).join('')
+        : '<p class="text-slate-500 italic">No revenue entries</p>';
+      document.getElementById('reportTotalRev').textContent = formatINR(totalRev);
+
+      const expMap = {};
+      mExps.forEach(e => { expMap[e.category] = (expMap[e.category] || 0) + Number(e.amount || 0); });
+      const totalExp = mExps.reduce((s, e) => s + Number(e.amount || 0), 0);
+
+      document.getElementById('reportExpBreakdown').innerHTML = Object.keys(expMap).length
+        ? Object.entries(expMap).map(([k, v]) => `<div class="flex justify-between"><span class="text-slate-400">${escapeHtml(k)}</span><span class="font-medium text-slate-200">${formatINR(v)}</span></div>`).join('')
+        : '<p class="text-slate-500 italic">No operating expenses</p>';
+      document.getElementById('reportTotalExp').textContent = formatINR(totalExp);
+
+      const advSum = mStaff.filter(t => t.type === 'Advance').reduce((s, t) => s + Number(t.amount || 0), 0);
+      const salSum = mStaff.filter(t => t.type === 'Salary Payment').reduce((s, t) => s + Number(t.amount || 0), 0);
+      const totalStaff = advSum + salSum;
+
+      document.getElementById('reportStaffBreakdown').innerHTML = `
+        <div class="flex justify-between"><span class="text-slate-400">Advances Given</span><span class="font-medium text-slate-200">${formatINR(advSum)}</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Salary Payments</span><span class="font-medium text-slate-200">${formatINR(salSum)}</span></div>
+      `;
+      document.getElementById('reportTotalStaff').textContent = formatINR(totalStaff);
+
+      const net = totalRev - totalExp - totalStaff;
+      const margin = totalRev > 0 ? ((net / totalRev) * 100).toFixed(1) : '0.0';
+      const netValEl = document.getElementById('reportNetValue');
+      const netBox = document.getElementById('reportNetBox');
+
+      netValEl.textContent = formatINR(net);
+      document.getElementById('reportNetSub').textContent = `Profit Margin: ${margin}% • Total Outflow: ${formatINR(totalExp + totalStaff)}`;
+
+      if (net > 0) {
+        netValEl.className = 'text-2xl sm:text-3xl font-extrabold tracking-tight text-emerald-400';
+        netBox.className = 'mt-5 rounded-xl border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-emerald-950/25 border-emerald-500/30';
+      } else if (net < 0) {
+        netValEl.className = 'text-2xl sm:text-3xl font-extrabold tracking-tight text-rose-400';
+        netBox.className = 'mt-5 rounded-xl border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-rose-950/25 border-rose-500/30';
+      } else {
+        netValEl.className = 'text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-200';
+        netBox.className = 'mt-5 rounded-xl border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-950/80 border-slate-800';
+      }
+    }
+
+    const csvEscape = (v) => `"${String(v === null || v === undefined ? '' : v).replace(/"/g, '""')}"`;
+
+    function getSafeHotelSlug() {
+      return (state.profile.hotelName || 'HotelKhata').replace(/[^a-zA-Z0-9_-]/g, '_');
+    }
+
+    function exportMonthlyCSV() {
+      const mRevs = state.revenues.filter(r => (r.date || '').startsWith(selectedMonth));
+      const mExps = state.expenses.filter(e => (e.date || '').startsWith(selectedMonth));
+      const mStaff = state.staffTx.filter(t => (t.date || '').startsWith(selectedMonth));
+
+      const rows = [
+        [`${state.profile.hotelName || 'HotelKhata'} - Monthly P&L Report`, formatMonthLabel(selectedMonth)],
+        [],
+        ['Date', 'Section', 'Booking ID', 'Type / Staff', 'Source / Category', 'Payment Mode', 'Amount (INR)', 'Notes']
+      ];
+
+      mRevs.forEach(r => rows.push([r.date, 'Revenue', r.bookingId || '', 'Income', r.category, r.paymentMode, r.amount, r.note || '']));
+      mExps.forEach(e => rows.push([e.date, 'Expense', '', e.type, e.category, e.paymentMode, -Math.abs(e.amount), e.note || '']));
+      mStaff.forEach(t => rows.push([t.date, 'Staff Payout', '', getStaffName(t.staffId, t.staffNameSnapshot), t.type, t.paymentMode, -Math.abs(t.amount), t.note || '']));
+
+      const totalRev = mRevs.reduce((s, r) => s + Number(r.amount || 0), 0);
+      const totalExp = mExps.reduce((s, e) => s + Number(e.amount || 0), 0);
+      const totalStaff = mStaff.reduce((s, t) => s + Number(t.amount || 0), 0);
+      const net = totalRev - totalExp - totalStaff;
+
+      rows.push([]);
+      rows.push(['SUMMARY', '', '', '', '', 'Total Revenue', totalRev, '']);
+      rows.push(['SUMMARY', '', '', '', '', 'Operating Expenses', totalExp, '']);
+      rows.push(['SUMMARY', '', '', '', '', 'Staff Payouts', totalStaff, '']);
+      rows.push(['SUMMARY', '', '', '', '', 'Net Profit / Loss', net, '']);
+
+      const csvContent = '\uFEFF' + rows.map(r => r.map(csvEscape).join(',')).join('\n');
+      triggerDownload(csvContent, `${getSafeHotelSlug()}_PnL_${selectedMonth}.csv`, 'text/csv;charset=utf-8;');
+      showToast(`Exported ${selectedMonth} P&L CSV report.`);
+    }
+
+    function exportRevenueCSV() {
+      const mRevs = state.revenues
+        .filter(r => (r.date || '').startsWith(selectedMonth))
+        .sort((a, b) => a.date.localeCompare(b.date));
+      const rows = [
+        ['Date', 'Booking ID', 'Revenue Source', 'Payment Mode', 'Amount (INR)', 'Notes'],
+        ...mRevs.map(r => [r.date, r.bookingId || '', r.category, r.paymentMode, r.amount, r.note || ''])
+      ];
+      const csvContent = '\uFEFF' + rows.map(r => r.map(csvEscape).join(',')).join('\n');
+      triggerDownload(csvContent, `${getSafeHotelSlug()}_Revenue_${selectedMonth}.csv`, 'text/csv;charset=utf-8;');
+      showToast('Revenue CSV exported.');
+    }
+
+    function exportExpensesCSV() {
+      const mExps = state.expenses
+        .filter(e => (e.date || '').startsWith(selectedMonth))
+        .sort((a, b) => a.date.localeCompare(b.date));
+      const rows = [
+        ['Date', 'Expense Type', 'Category', 'Payment Mode', 'Amount (INR)', 'Notes'],
+        ...mExps.map(e => [e.date, e.type, e.category, e.paymentMode, e.amount, e.note || ''])
+      ];
+      const csvContent = '\uFEFF' + rows.map(r => r.map(csvEscape).join(',')).join('\n');
+      triggerDownload(csvContent, `${getSafeHotelSlug()}_Expenses_${selectedMonth}.csv`, 'text/csv;charset=utf-8;');
+      showToast('Expenses CSV exported.');
+    }
+
+    function exportStaffLedgerCSV() {
+      const monthTx = state.staffTx.filter(t => (t.date || '').startsWith(selectedMonth));
+      const rows = [
+        ['Staff Name', 'Role', 'Phone / Notes', 'Monthly Salary (INR)', 'Advance Taken (INR)', 'Salary Paid (INR)', 'Pending Balance (INR)', 'Status']
+      ];
+      state.staff.forEach(s => {
+        const sTx = monthTx.filter(t => t.staffId === s.id);
+        const adv = sTx.filter(t => t.type === 'Advance').reduce((sum, t) => sum + Number(t.amount || 0), 0);
+        const salPaid = sTx.filter(t => t.type === 'Salary Payment').reduce((sum, t) => sum + Number(t.amount || 0), 0);
+        const salary = Number(s.monthlySalary || 0);
+        const pending = salary - (adv + salPaid);
+        const status = pending === 0 ? 'Settled' : pending > 0 ? 'Pending' : 'Extra Paid';
+        rows.push([s.name, s.role, s.phone || '', salary, adv, salPaid, pending, status]);
+      });
+      const csvContent = '\uFEFF' + rows.map(r => r.map(csvEscape).join(',')).join('\n');
+      triggerDownload(csvContent, `${getSafeHotelSlug()}_StaffLedger_${selectedMonth}.csv`, 'text/csv;charset=utf-8;');
+      showToast('Staff Ledger CSV exported.');
+    }
+
+    function downloadJSONBackup() {
+      const payload = {
+        app: 'HotelKhata',
+        version: 3,
+        exportedAt: new Date().toISOString(),
+        data: state
+      };
+      triggerDownload(JSON.stringify(payload, null, 2), `${getSafeHotelSlug()}_Backup_${getTodayISO()}.json`, 'application/json');
+      showToast('Full JSON backup downloaded.');
+    }
+
+    function handleJSONRestoreFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const dataObj = parsed.data ? parsed.data : parsed;
+          if (!Array.isArray(dataObj.revenues) || !Array.isArray(dataObj.expenses) || !Array.isArray(dataObj.staff) || !Array.isArray(dataObj.staffTx)) {
+            showToast('Invalid backup file format.', 'error');
+            return;
+          }
+
+          showConfirmModal(
+            'Restore JSON Backup?',
+            `Found ${dataObj.revenues.length} revenue, ${dataObj.expenses.length} expense, ${dataObj.staff.length} staff, and ${dataObj.staffTx.length} staff payment records. This will replace your current hotel entries.`,
+            () => {
+              state = {
+                profile: dataObj.profile || state.profile,
+                revenues: dataObj.revenues,
+                expenses: dataObj.expenses,
+                staff: dataObj.staff,
+                staffTx: dataObj.staffTx
+              };
+              saveVaultData();
+              applyHotelBranding();
+              renderAll();
+              showToast('Backup restored successfully!');
+            },
+            'Restore Backup',
+            false
+          );
+        } catch (err) {
+          console.error(err);
+          showToast('Could not read JSON file.', 'error');
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function triggerDownload(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    // ==================== DEMO DATA & CLEAR ====================
+
+    function loadDemoData() {
+      const today = getTodayISO();
+      const ym = selectedMonth;
+      const d1 = `${ym}-02`;
+      const d2 = `${ym}-05`;
+      const d3 = `${ym}-10`;
+      const d4 = `${ym}-15`;
+      const dToday = today.startsWith(ym) ? today : `${ym}-20`;
+
+      const s1 = uid('stf'), s2 = uid('stf'), s3 = uid('stf');
+
+      state.staff = [
+        { id: s1, name: 'Ramesh Sharma', role: 'Reception', phone: '9820112233', monthlySalary: 15000 },
+        { id: s2, name: 'Sunil Verma', role: 'Housekeeping', phone: '9811445566', monthlySalary: 11000 },
+        { id: s3, name: 'Mohan Singh', role: 'Guard', phone: '9755889900', monthlySalary: 10500 }
+      ];
+      state.revenues = [
+        { id: uid('rev'), date: d1, bookingId: 'WLK-101', category: 'Walk-in', paymentMode: 'Cash', amount: 11400, note: 'Standard check-in' },
+        { id: uid('rev'), date: d2, bookingId: 'OYO84921', category: 'OYO', paymentMode: 'OYO Prepaid', amount: 14800, note: 'Weekly OYO settlement' },
+        { id: uid('rev'), date: d3, bookingId: 'FB-019', category: 'F&B', paymentMode: 'UPI', amount: 3650, note: 'Room service & tea' },
+        { id: uid('rev'), date: d4, bookingId: 'OTA-5521', category: 'Online OTA', paymentMode: 'Card / Bank', amount: 13500, note: 'Corporate weekend booking' },
+        { id: uid('rev'), date: dToday, bookingId: 'WLK-108', category: 'Walk-in', paymentMode: 'Cash', amount: 9500, note: 'Morning check-in' },
+        { id: uid('rev'), date: dToday, bookingId: 'OYO85104', category: 'OYO', paymentMode: 'UPI', amount: 7200, note: 'Pay at hotel via UPI' }
+      ];
+      state.expenses = [
+        { id: uid('exp'), date: d1, type: 'Monthly Fixed', category: 'Rent/EMI', paymentMode: 'Card / Bank', amount: 22000, note: 'Monthly building rent' },
+        { id: uid('exp'), date: d2, type: 'Monthly Fixed', category: 'Electricity/Water', paymentMode: 'UPI', amount: 6800, note: 'Electricity & water bill' },
+        { id: uid('exp'), date: d3, type: 'Daily Expense', category: 'Housekeeping', paymentMode: 'Cash', amount: 1450, note: 'Bedsheets, towels & cleaning supplies' },
+        { id: uid('exp'), date: d4, type: 'Monthly Fixed', category: 'Internet/WiFi', paymentMode: 'UPI', amount: 1200, note: 'Fiber WiFi bill' },
+        { id: uid('exp'), date: dToday, type: 'Daily Expense', category: 'Kitchen/Groceries', paymentMode: 'Cash', amount: 850, note: 'Milk, tea powder, vegetables' }
+      ];
+      state.staffTx = [
+        { id: uid('stx'), staffId: s1, staffNameSnapshot: 'Ramesh Sharma', date: d2, type: 'Advance', paymentMode: 'Cash', amount: 3000, note: 'Mid-month advance' },
+        { id: uid('stx'), staffId: s2, staffNameSnapshot: 'Sunil Verma', date: d3, type: 'Advance', paymentMode: 'UPI', amount: 2000, note: 'Home medical need' },
+        { id: uid('stx'), staffId: s3, staffNameSnapshot: 'Mohan Singh', date: d4, type: 'Salary Payment', paymentMode: 'Cash', amount: 10500, note: 'Full month settled' },
+        { id: uid('stx'), staffId: s1, staffNameSnapshot: 'Ramesh Sharma', date: dToday, type: 'Salary Payment', paymentMode: 'UPI', amount: 5000, note: 'Part salary paid' }
+      ];
+
+      saveVaultData();
+      renderAll();
+      showToast('Sample hotel data loaded!');
+    }
+
+    function confirmLoadDemoData() {
+      showConfirmModal(
+        'Load Sample Hotel Data?',
+        'This will replace your current hotel records with sample revenue, expenses, and staff entries.',
+        loadDemoData,
+        'Load Sample',
+        false
+      );
+    }
+
+    function confirmClearAllData() {
+      showConfirmModal(
+        'Clear All Hotel Data?',
+        'All revenue, expense, staff, and salary records will be erased from this device. Your login ID & password will remain intact.',
+        () => {
+          state.revenues = [];
+          state.expenses = [];
+          state.staff = [];
+          state.staffTx = [];
+          saveVaultData();
+          renderAll();
+          showToast('All hotel records cleared.', 'info');
+        },
+        'Erase Everything',
+        true
+      );
+    }
+
+    // ==================== INITIALIZATION & BOOTSTRAP ====================
+
+    function initApp() {
+      const now = new Date();
+      document.getElementById('todayDateDisplay').textContent =
+        `Today: ${now.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}`;
+
+      const monthInput = document.getElementById('globalMonthInput');
+      monthInput.value = selectedMonth;
+      monthInput.addEventListener('change', (e) => {
+        if (e.target.value) {
+          selectedMonth = e.target.value;
+          resetRevenueForm();
+          resetExpenseForm();
+          resetStaffTxForm();
+          renderAll();
+        }
+      });
+
+      resetRevenueForm();
+      resetExpenseForm();
+      resetStaffTxForm();
+
+      document.querySelectorAll('.nav-btn, .nav-btn-mobile').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+
+      document.getElementById('confirmModalCancel').addEventListener('click', closeConfirmModal);
+      document.getElementById('confirmModalOk').addEventListener('click', () => {
+        const cb = pendingConfirmCallback;
+        closeConfirmModal();
+        if (typeof cb === 'function') cb();
+      });
+
+      // Initialize Mobile App Icon, Manifest & PWA Install Hook
+      initMobileAppFeatures();
+
+      // Standalone Auth Check (No Firebase, Instant Boot)
+      const ownerAuth = getOwnerAuth();
+      const activeSession = getActiveSession();
+
+      if (!ownerAuth) {
+        // First visit: show Setup Your Private Hotel Portal
+        document.getElementById('appShell').classList.add('hidden');
+        document.getElementById('authPortal').classList.remove('hidden');
+        showAuthView('setup');
+      } else if (activeSession && activeSession.loginId && activeSession.loginId.toLowerCase() === ownerAuth.loginIdLower) {
+        // Valid active session: enter dashboard directly
+        enterAuthenticatedApp();
+      } else {
+        // Registered but logged out: show Owner Login
+        document.getElementById('appShell').classList.add('hidden');
+        document.getElementById('authPortal').classList.remove('hidden');
+        showAuthView('login');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
